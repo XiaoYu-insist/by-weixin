@@ -4,8 +4,12 @@
  * declare module 'vue'
  */
 import 'vue'
+import BYdevice from '@/components/BYdevice.vue'
+import BYdoorlocks from '@/components/BYdoorlocks.vue'
 declare module 'vue' {
   export interface GlobalComponents {
+    BYdevice:typeof BYdevice
+    BYdoorlocks:typeof BYdoorlocks
     //
   }
 }

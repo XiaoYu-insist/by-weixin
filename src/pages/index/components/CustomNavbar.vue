@@ -1,0 +1,81 @@
+<script lang="ts" setup>
+const { safeAreaInsets } = uni.getSystemInfoSync()
+</script>
+<template>
+  <view class="page" :style="{ paddingTop: safeAreaInsets!.top + 'px' }">
+    <!-- 个人资料 -->
+    <view class="profile">
+      <!-- 情况1：已登录 -->
+      <view class="overview" v-if="true">
+        <view class="meta">
+          <view class="nickname"> 你好 </view>
+          <navigator class="extra" url="/pagesMember/profile/profile" hover-class="none">
+            <text class="update">欢迎使用泊云社区</text>
+          </navigator>
+        </view>
+      </view>
+      <!-- 情况2：未登录 -->
+      <view class="overview" v-else>
+        <view class="meta">
+          <navigator url="/pages/login/login" hover-class="none" class="nickname">
+            未登录
+          </navigator>
+          <view class="extra">
+            <text class="tips">点击登录账号</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</template>
+
+<style lang="scss">
+/* 用户信息 */
+.profile {
+  margin-top: 20rpx;
+  position: relative;
+
+  .overview {
+    display: flex;
+    justify-content: space-between;
+    height: 120rpx;
+    padding: 0 36rpx;
+    color: #000;
+  }
+
+  .meta {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    line-height: 30rpx;
+    padding: 16rpx 0;
+    margin-left: 20rpx;
+  }
+
+  .nickname {
+    max-width: 400rpx;
+    margin-bottom: 25rpx;
+    font-size: 45rpx;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .extra {
+    display: flex;
+    font-size: 20rpx;
+  }
+
+  .tips {
+    font-size: 22rpx;
+    color: #979a9a;
+  }
+
+  .update {
+    margin-right: 10rpx;
+    border-radius: 30rpx;
+    color: #979a9a;
+    font-size: medium;
+  }
+}
+</style>

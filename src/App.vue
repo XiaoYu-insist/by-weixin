@@ -12,9 +12,14 @@ onHide(() => {
 })
 </script>
 
+
 <style lang="scss">
 // 字体图标
 @import '@/styles/fonts.scss';
+
+/* 背景 */
+@import '@/styles/background.scss';
+
 
 view,
 navigator,
@@ -38,6 +43,14 @@ image {
   width: 100%;
   height: 100%;
   vertical-align: middle;
+}
+
+.icon {
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.15em;
+  fill: currentColor;
+  overflow: hidden;
 }
 
 // 两行省略

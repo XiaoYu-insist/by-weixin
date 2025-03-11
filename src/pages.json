@@ -1,70 +1,115 @@
 {
-  "easycom": {
+	"easycom": {
 		"autoscan": true,
 		"custom": {
 			// uni-ui 规则如下配置
-			"^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue"
+			"^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue",
+			// 自动导入组件
+			"^BY(.*)": "@/components/BY$1.vue"
 		}
 	},
-  "pages": [
-    //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
-    {
-      "path": "pages/index/index",
-      "style": {
-        "navigationBarTitleText": "首页"
-      }
-    },
-    {
-      "path": "pages/my/my",
-      "style": {
-        "navigationBarTitleText": "我的"
-      }
-    },
-    {
-      "path": "pages/category/category",
-      "style": {
-        "navigationBarTitleText": "分类"
-      }
-    },
-    {
-      "path": "pages/login/login",
-      "style": {
-        "navigationBarTitleText": "登录"
-      }
-    }
-  ],
-  "globalStyle": {
-    "navigationBarTextStyle": "black",
-    "navigationBarTitleText": "",
-    "navigationBarBackgroundColor": "#F8F8F8",
-    "enablePullDownRefresh":true,
-    "backgroundColor": "#F8F8F8"
-  },
-  // 设置 TabBar
-  "tabBar": {
-    "color": "#333",
-    "selectedColor": "#6B3992",
-    "backgroundColor": "#fff",
-    "borderStyle": "white",
-    "list": [
-      {
-        "text": "首页",
-        "pagePath": "pages/index/index",
-        "iconPath": "static/tabs/home_default.png",
-        "selectedIconPath": "static/tabs/home_selected.png"
-      },
-      {
-        "text": "分类",
-        "pagePath": "pages/category/category",
-        "iconPath": "static/tabs/category_default.png",
-        "selectedIconPath": "static/tabs/category_selected.png"
-      },
-      {
-        "text": "我的",
-        "pagePath": "pages/my/my",
-        "iconPath": "static/tabs/user_default.png",
-        "selectedIconPath": "static/tabs/user_selected.png"
-      }
-    ]
-  }
+	"pages": [
+		//pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationBarTitleText": "首页",
+				"navigationStyle": "custom",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path": "pages/my/my",
+			"style": {
+				"navigationBarTitleText": "我的",
+				"navigationStyle": "custom",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path": "pages/tenants/tenants",
+			"style": {
+				"navigationBarTitleText": "租户",
+				"navigationStyle": "custom",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path": "pages/login/login",
+			"style": {
+				"navigationBarTitleText": "登录"
+			}
+		},
+		{
+			"path": "pages/device/device",
+			"style": {
+				"navigationBarTitleText": "设备详细"
+			}
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"enablePullDownRefresh": true,
+		"backgroundColor": "#F8F8F8"
+	},
+	// 设置 TabBar
+	"tabBar": {
+		"color": "#333",
+		"selectedColor": "#5BB79C",
+		"backgroundColor": "#fff",
+		"borderStyle": "white",
+		"list": [
+			{
+				"text": "首页",
+				"pagePath": "pages/index/index",
+				"iconPath": "static/tabs/home_default.png",
+				"selectedIconPath": "static/tabs/home_selected.png"
+			},
+			{
+				"text": "租户",
+				"pagePath": "pages/tenants/tenants",
+				"iconPath": "static/tabs/category_default.png",
+				"selectedIconPath": "static/tabs/category_selected.png"
+			},
+			{
+				"text": "我的",
+				"pagePath": "pages/my/my",
+				"iconPath": "static/tabs/user_default.png",
+				"selectedIconPath": "static/tabs/user_selected.png"
+			}
+		]
+	},
+	"subPackages": [
+		{
+			"root": "pageDataList",
+			"pages": [
+				{
+					"path": "exhibitList/exhibitList",
+					"style": {
+						"navigationBarTitleText": "详细"
+					}
+				},
+				{
+					"path": "tenantsList/tenantsList",
+					"style": {
+						"navigationBarTitleText": "租户信息"
+					}
+				},
+				{
+					"path": "Collector/Collector",
+					"style": {
+						"navigationBarTitleText": "采集器详细"
+					}
+				},
+				{
+					"path": "failData/failData",
+					"style": {
+						"navigationBarTitleText": "失败数量"
+					}
+				}
+			]
+		}
+	]
 }

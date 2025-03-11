@@ -1,0 +1,46 @@
+page {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  background-color:  #F4F9F7; // 主背景色
+  overflow: hidden;
+
+  // 右上绿色圆形（严格还原位置）
+  &::before {
+    z-index: -1;
+    content: '';
+    position: absolute;
+    width: 600rpx;
+    height: 600rpx;
+    right: 0;      // 右边缘对齐
+    top: 0;        // 上边缘对齐
+    background: radial-gradient(
+      circle at 70% 30%,
+      rgba(139, 195, 74, 0.15) 0%,
+      transparent 70%
+    );
+    filter: blur(80rpx);
+    border-radius: 50%;
+  }
+
+  // 左下黄色圆形（严格还原位置）
+  &::after {
+    z-index: -1;
+    content: '';
+    position: absolute;
+    width: 500rpx;
+    height: 500rpx;
+    left: 0;       // 左边缘对齐
+    top: 20%;      // 下边缘对齐
+    background: radial-gradient(
+      circle at 30% 70%,
+      rgba(255, 238, 88, 0.2) 0%,
+      transparent 70%
+    );
+    filter: blur(60rpx);
+    border-radius: 50%;
+  }
+}
