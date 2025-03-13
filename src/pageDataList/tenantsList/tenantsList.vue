@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, watchEffect } from 'vue'
 
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getWindowInfo()
 // 获取屏幕宽度
 const windowWidth = uni.getWindowInfo().safeArea.width
+
 // tabs 数据
 const orderTabs = ref([
   { orderState: 0, title: '全部用户' },
@@ -45,6 +46,7 @@ const updateCursorPosition = () => {
 // 监听 activeIndex 变化
 watch(activeIndex, () => {
   updateCursorPosition()
+  console.log(uni.getWindowInfo())
 })
 </script>
 
