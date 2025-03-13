@@ -2,9 +2,10 @@
 import { ref, watch } from 'vue'
 
 // 获取屏幕边界到安全区域距离
-const { safeAreaInsets } = uni.getSystemInfoSync()
+
+const { safeArea } = uni.getWindowInfo()
 // 获取屏幕宽度
-const windowWidth = uni.getSystemInfoSync().windowWidth
+const windowWidth = uni.getWindowInfo().safeArea.width
 
 // tabs 数据
 const orderTabs = ref([
@@ -109,7 +110,7 @@ watch(activeIndex, () => {
             </view>
           </view>
           <!-- 底部提示文字 -->
-          <view class="loading-text" :style="{ paddingBottom: safeAreaInsets?.bottom + 'px' }">
+          <view class="loading-text" :style="{ paddingBottom: safeArea?.bottom + 'px' }">
             {{ true ? '没有更多数据~' : '正在加载...' }}
           </view>
         </scroll-view>

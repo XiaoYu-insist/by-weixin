@@ -22,10 +22,10 @@ const navItems = ref([
 
     <!-- 主内容区域 -->
     <view class="main-content">
-      <BYdevice v-if="currentNav === 0" :type="currentNav" />
-      <BYdevice v-else-if="currentNav === 1" :type="currentNav" />
-      <BYdevice v-else-if="currentNav === 2" :type="currentNav" />
-      <BYdoorlocks v-else-if="currentNav === 3" />
+      <view v-for="item, index in navItems" :key="index">
+        <BYdevice v-if="index === currentNav && currentNav !== 3" :type="currentNav" />
+      </view>
+      <BYdoorlocks v-if="currentNav === 3" />
     </view>
   </view>
 </template>

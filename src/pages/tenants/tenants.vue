@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
-const { safeAreaInsets } = uni.getSystemInfoSync()
+const { safeArea } = uni.getWindowInfo()
 const searchText = ref('');
 const selectedDevice = ref<any>(null);
 const selectedRoom = ref<any>(null);
@@ -22,7 +22,7 @@ const handleDeviceClick = (device: any, room: any) => {
 </script>
 
 <template>
-  <view class="container" :style="{ paddingTop: safeAreaInsets!.top + 'px' }">
+  <view class="container" :style="{ paddingTop: safeArea!.top + 'px' }">
     <text class="tenants-name">租户</text>
     <!-- 搜索栏 -->
     <view class="search-bar">

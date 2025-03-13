@@ -1,30 +1,6 @@
 <script lang="ts" setup>
 
-const { safeAreaInsets } = uni.getSystemInfoSync()
-
-const handlePurchaseElectricity = () => {
-  uni.navigateTo({
-    url: "/pages/purchase/electricity",
-  });
-};
-
-const handleBindHouse = () => {
-  uni.navigateTo({
-    url: "/pages/bind/house",
-  });
-};
-
-const handleRechargeRecord = () => {
-  uni.navigateTo({
-    url: "/pages/record/recharge",
-  });
-};
-
-const handleUsageRecord = () => {
-  uni.navigateTo({
-    url: "/pages/record/usage",
-  });
-};
+const { safeArea } = uni.getWindowInfo()
 
 const handleLogout = () => {
   uni.showModal({
@@ -48,7 +24,7 @@ const handleLogout = () => {
 };
 </script>
 <template>
-  <view class="head" :style="{ paddingTop: safeAreaInsets!.top + 'px' }">
+  <view class="head" :style="{ paddingTop: safeArea!.top + 'px' }">
     <!-- 用户信息区域 -->
     <view class="user-section">
       <view class="avatar-container">
@@ -60,40 +36,31 @@ const handleLogout = () => {
 
     <!-- 功能列表 -->
     <view class="menu-list">
-      <view class="menu-item cursor-pointer" @tap="handlePurchaseElectricity">
-        <view class="menu-item-left">
-          <text class="icon-goudianshichangzhuti" />
-          <text>购电</text>
-        </view>
-        <uni-icons type="right" size="16" color="#CCCCCC"></uni-icons>
-      </view>
-
-      <view class="menu-item cursor-pointer" @tap="handleBindHouse">
+      <navigator class="menu-item cursor-pointer" hover-class="none" url="/pageSettings/house/house">
         <view class="menu-item-left">
           <text class="icon-xinzengbangding" />
-          <text>绑定房东</text>
+          <text>房东管理</text>
         </view>
-        <view class="action-button">
-          <text>立即绑定</text>
-          <uni-icons type="right" size="16" color="#FFFFFF"></uni-icons>
-        </view>
-      </view>
+        <uni-icons type="right" size="16" color="#CCCCCC"></uni-icons>
+      </navigator>
 
-      <view class="menu-item cursor-pointer" @tap="handleRechargeRecord">
+      <navigator class="menu-item cursor-pointer" hover-class="none"
+        :url="`/pageDataList/exhibitList/exhibitList?type=${0}`">
         <view class="menu-item-left">
           <text class="icon-chongzhijilu" />
           <text>充值记录</text>
         </view>
         <uni-icons type="right" size="16" color="#CCCCCC"></uni-icons>
-      </view>
+      </navigator>
 
-      <view class="menu-item cursor-pointer" @tap="handleUsageRecord">
+      <navigator class="menu-item cursor-pointer" hover-class="none"
+        :url="`/pageDataList/exhibitList/exhibitList?type=${0}`">
         <view class="menu-item-left">
           <text class="icon-ele_bill" />
-          <text>用电记录</text>
+          <text>操作记录</text>
         </view>
         <uni-icons type="right" size="16" color="#CCCCCC"></uni-icons>
-      </view>
+      </navigator>
 
       <view class="menu-item cursor-pointer" @tap="handleLogout">
         <view class="menu-item-left">

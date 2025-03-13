@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref } from "vue";
-import { doorlocks } from "@/data/index/deviceData/deviceIfon";
-import { loading, setButtonTypeProcess } from './buttonAchieve'
+import { doorlocks } from "@/data/deviceData/deviceIfon";
+import { setButtonTypeProcess } from './buttonAchieve'
 const operations = ref([
   { type: 3, name: "更新", icon: "icon-gengxin" },
   { type: 4, name: "二维码", icon: "icon-fenxiangerweima" },
@@ -88,8 +88,8 @@ const showIcon = () => {
   <view class="operation-section">
     <text class="section-title">更多操作</text>
     <view class="operation-grid">
-      <button class="grid-item" hover-class="none" :disabled="loading" plain v-for="(item, index) in operations"
-        :key="index" @tap="setButtonTypeProcess(3, item.type)">
+      <button class="grid-item" hover-class="none" plain v-for="(item, index) in operations" :key="index"
+        @tap="setButtonTypeProcess(3, item.type)">
         <view class="icon-wrapper" :class="item.icon">
         </view>
         {{ item.name }}

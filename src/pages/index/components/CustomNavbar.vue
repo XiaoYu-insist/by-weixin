@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-const { safeAreaInsets } = uni.getSystemInfoSync()
+const { safeArea } = uni.getWindowInfo()
 </script>
 <template>
-  <view class="page" :style="{ paddingTop: safeAreaInsets!.top + 'px' }">
+  <view class="page" :style="{ paddingTop: safeArea!.top + 'px' }">
     <!-- 个人资料 -->
     <view class="profile">
       <!-- 情况1：已登录 -->
@@ -15,16 +15,7 @@ const { safeAreaInsets } = uni.getSystemInfoSync()
         </view>
       </view>
       <!-- 情况2：未登录 -->
-      <view class="overview" v-else>
-        <view class="meta">
-          <navigator url="/pages/login/login" hover-class="none" class="nickname">
-            未登录
-          </navigator>
-          <view class="extra">
-            <text class="tips">点击登录账号</text>
-          </view>
-        </view>
-      </view>
+
     </view>
   </view>
 </template>

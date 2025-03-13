@@ -1,6 +1,6 @@
 <template>
   <view class="meter-card">
-    <navigator url="/pageDataList/exhibitList/exhibitList" hover-class="none" class="meter-info">
+    <navigator :url="`/pageDataList/exhibitList/exhibitList?type=${0}`" hover-class="none" class="meter-info">
       <view class="meter-title">当月收入金额</view>
       <view class="meter-reading">
         <text class="number">3426.8</text>
@@ -8,11 +8,11 @@
       </view>
     </navigator>
     <view class="usage-stats">
-      <navigator url="/pageDataList/exhibitList/exhibitList" hover-class="none" class="stat-item">
+      <navigator :url="`/pageDataList/exhibitList/exhibitList?type=${1}`" hover-class="none" class="stat-item">
         <text class="label">今日充值</text>
         <text class="value">2笔</text>
       </navigator>
-      <navigator url="/pageDataList/exhibitList/exhibitList" hover-class="none" class="stat-item">
+      <navigator :url="`/pageDataList/exhibitList/exhibitList?type=${2}`" hover-class="none" class="stat-item">
         <text class="label">今日收入</text>
         <text class="value increase">300元</text>
       </navigator>

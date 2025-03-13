@@ -2,8 +2,14 @@
 import { onLoad } from "@dcloudio/uni-app";
 import { ref } from "vue";
 
+/**
+ * 页面参数
+ * type : 0 显示器日期, 1 日期消失
+ * states : 选择按钮
+ */
 const query = defineProps<{
-  type: string
+  type: number,
+  states?: number
 }>()
 const billList = ref([
   { time: "2023-06-20 12:23:45", amount: "5" },
@@ -30,7 +36,6 @@ const showBillDetail = (bill: any) => {
   uni.showModal({
     title: "账单详情",
     content: `充值时间：${bill.time}\n充值金额：${bill.amount}元`,
-    showCancel: false,
   });
 };
 /* 修改日期 */
@@ -44,6 +49,7 @@ const ranges = ref([
   { value: 1, text: "扣费" },
   { value: 2, text: "使用" },
 ])
+
 // 按钮选择
 const onchange = () => {
   data()
@@ -57,21 +63,22 @@ const data = () => {
 onLoad(() => {
   today.value = formatDate(new Date())
 })
+
 </script>
 
 <template>
   <view class="pages">
     <!-- 顶部日期选择 -->
-    <view class="header" v-if="query">
+    <view class="header">
       <uni-data-select class="data-select" v-model="value" :localdata="ranges" :clear="false" @change="onchange"
-        v-if="false"></uni-data-select>
-      <uni-datetime-picker :end="today" v-model="range" type="daterange" :clear-icon="false" @change="maskClick" />
+        v-if="query.states"></uni-data-select>
+      <uni-datetime-picker v-if="query.type == 0" :end="today" v-model="range" type="daterange" :clear-icon="false"
+        @change="maskClick" />
     </view>
 
     <!-- 账单列表 -->
     <scroll-view class="bill-list" scroll-y>
-      <view v-for="(item, index) in billList" :key="index" class="bill-item cursor-pointer"
-        @click="showBillDetail(item)">
+      <view v-for="(item, index) in billList" :key="index" class="bill-item cursor-pointer" @tap="showBillDetail(item)">
         <view class="bill-left">
           <view class="icon-wrapper icon-chongzhijiaofei">
           </view>

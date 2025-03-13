@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref, onBeforeMount } from "vue";
-import { ammeter, water, hotwater, operations } from '@/data/index/deviceData/deviceIfon'
-import { loading, setButtonTypeProcess } from './buttonAchieve'
+import { ammeter, water, hotwater, operations } from '@/data/deviceData/deviceIfon'
+import { setButtonTypeProcess } from './buttonAchieve'
 
 const query = defineProps<{
   type: number
@@ -17,6 +17,14 @@ onBeforeMount(() => {
     deviceList.value = hotwater
   }
 })
+
+const popup = ref(null) // 获取 uni-popup 的引用
+const popupContent = ref('')
+const handleButtonClick = (DeviceId: number, butType: number) => {
+  // 将 popup 引用传递给处理函数
+  setButtonTypeProcess(DeviceId, butType, popup.value)
+}
+
 </script>
 <template>
   <!-- 设备信息卡片 -->
@@ -61,15 +69,17 @@ onBeforeMount(() => {
   <view class="operation-section">
     <text class="section-title">更多操作</text>
     <view class="operation-grid">
-      <button class="grid-item" hover-class="none" :disabled="loading" plain v-for="(item, index) in operations"
-        :key="index" @tap="setButtonTypeProcess(query.type, item.type)">
+      <button class="grid-item" hover-class="none" plain v-for="(item, index) in operations" :key="index"
+        @tap="handleButtonClick(query.type, item.type)">
         <view class="icon-wrapper" :class="item.icon">
         </view>
         {{ item.name }}
       </button>
     </view>
   </view>
-
+  <uni-popup ref="popup" type="bottom" border-radius="10px 10px 0 0" background-color="#fff">
+    {{ popupContent }}
+  </uni-popup>
 </template>
 <style lang="scss">
 .device-card {

@@ -7,18 +7,20 @@ export const loading = ref(false)
  * 用于详细设备后的按钮功能
  * @param DeviceId 设备参数
  * @param butType 按下去按钮参数
+ * @param popup 底部弹窗
  */
-export const setButtonTypeProcess = (DeviceId:number,butType:number)=>{
-
+export const setButtonTypeProcess = (DeviceId:number,butType:number,popup:any)=>{
   switch(butType)
   {
       /* 弹窗 loading */
       case 1:
           // 开启
           loading.value =true
-          setTimeout(()=>{
-            loading.value = false
-          },500)
+          uni.showToast({
+            title:"加载中···",
+            mask:true,
+            icon:'loading',
+          })
           break;
       case 2:
           //关闭
@@ -32,18 +34,23 @@ export const setButtonTypeProcess = (DeviceId:number,butType:number)=>{
       /* 底部弹窗 */
       case 4:
           // 二维码
+          popup.open('center')
           break;
       case 5:
           // 修改
+          popup.open('bottom')
           break;
       case 6:
           // 充值
+          popup.open('bottom')
           break;
       case 8:
           // 采集器
+          popup.open('bottom')
           break;
       case 11:
           // 控制设备
+          popup.open('bottom')
           break;
       /* 切换页面 */
       case 9:
@@ -56,8 +63,4 @@ export const setButtonTypeProcess = (DeviceId:number,butType:number)=>{
             console.log("未处理"+butType)
   }
 }
-
-
-
-
 

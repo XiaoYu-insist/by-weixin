@@ -110,6 +110,29 @@
 					}
 				}
 			]
+		},
+		{
+			"root": "pageSettings",
+			"pages": [
+				{
+					"path": "house/house",
+					"style": {
+						"navigationBarTitleText": "房东管理"
+					}
+				},
+				{
+					"path": "recharge/recharge",
+					"style": {
+						"navigationBarTitleText": "充值记录"
+					}
+				},
+				{
+					"path": "usage/usage",
+					"style": {
+						"navigationBarTitleText": "操作记录"
+					}
+				}
+			]
 		}
 	]
 }
