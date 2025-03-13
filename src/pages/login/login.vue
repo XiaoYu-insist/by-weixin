@@ -1,30 +1,41 @@
 <script setup lang="ts">
+
+import { ref } from 'vue';
+
 //
+const switchLogin = ref(false)
 </script>
 
 <template>
   <view class="viewport">
     <view class="logo">
-      <image src="@/static/images/logo-icon2.png"></image>
+      <image src="@/static/images/logo-icon.png"></image>
     </view>
     <view class="login">
       <!-- 网页端表单登录 -->
-      <!-- <input class="input" type="text" placeholder="请输入用户名/手机号码" /> -->
-      <!-- <input class="input" type="text" password placeholder="请输入密码" /> -->
-      <!-- <button class="button phone">登录</button> -->
+      <view v-if="switchLogin">
+        <input class="input" type="text" placeholder="请输入用户名/手机号码" />
+        <input class="input" type="text" password placeholder="请输入密码" />
+        <button class="button phone">登录</button>
+      </view>
+
 
       <!-- 小程序端授权登录 -->
-      <button class="button phone">
-        手机号快捷登录
-      </button>
+      <view v-else>
+        <button class="button phone">
+          手机号快捷登录
+        </button>
+      </view>
       <view class="extra">
         <view class="caption">
           <text>其他登录方式</text>
         </view>
         <view class="options">
-          <!-- 通用模拟登录 -->
-          <button>
-            <text class="icon icon-zhanghao">账号登陆</text>
+          <!-- 切换登录 -->
+          <button @tap="switchLogin = !switchLogin">
+            <text class="icon " :class="switchLogin ? 'icon-weixin' : 'icon-zhanghao'">
+              {{ switchLogin ? "微信登录" : "账号登陆" }}
+            </text>
           </button>
         </view>
       </view>
@@ -145,11 +156,6 @@ page {
         border: 1rpx solid #444;
         border-radius: 50%;
       }
-    }
-
-    .icon-weixin::before {
-      border-color: #06c05f;
-      color: #06c05f;
     }
   }
 }

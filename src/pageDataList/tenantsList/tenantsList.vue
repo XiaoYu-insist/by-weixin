@@ -2,11 +2,9 @@
 import { ref, watch } from 'vue'
 
 // 获取屏幕边界到安全区域距离
-
-const { safeArea } = uni.getWindowInfo()
+const { safeAreaInsets } = uni.getWindowInfo()
 // 获取屏幕宽度
 const windowWidth = uni.getWindowInfo().safeArea.width
-
 // tabs 数据
 const orderTabs = ref([
   { orderState: 0, title: '全部用户' },
@@ -67,15 +65,7 @@ watch(activeIndex, () => {
       <swiper-item v-for="item in orderTabs" :key="item.orderState">
         <!-- 订单列表 -->
         <scroll-view scroll-y class="orders">
-          <view class="card" v-for="item in 2" :key="item">
-            <!-- 订单信息 -->
-            <view class="status">
-              <text class="date">2023-04-14 13:14:20</text>
-              <!-- 订单状态文字 -->
-              <text>待付款</text>
-              <!-- 待评价/已完成/已取消 状态: 展示删除订单 -->
-              <text class="icon-delete"></text>
-            </view>
+          <view class="card" v-for="item in 8" :key="item">
             <!-- 商品信息，点击商品跳转到订单详情，不是商品详情 -->
             <navigator v-for="sku in 1" :key="sku" class="goods" :url="`/pagesOrder/detail/detail?id=1`"
               hover-class="none">
@@ -94,23 +84,9 @@ watch(activeIndex, () => {
               <text>实付</text>
               <text class="amount"> <text class="symbol">¥</text>99</text>
             </view>
-            <!-- 订单操作按钮 -->
-            <view class="action">
-              <!-- 待付款状态：显示去支付按钮 -->
-              <template v-if="true">
-                <view class="button primary">去支付</view>
-              </template>
-              <template v-else>
-                <navigator class="button secondary" :url="`/pagesOrder/create/create?orderId=id`" hover-class="none">
-                  再次购买
-                </navigator>
-                <!-- 待收货状态: 展示确认收货 -->
-                <view v-if="false" class="button primary">确认收货</view>
-              </template>
-            </view>
           </view>
           <!-- 底部提示文字 -->
-          <view class="loading-text" :style="{ paddingBottom: safeArea?.bottom + 'px' }">
+          <view class="loading-text" :style="{ paddingBottom: safeAreaInsets?.bottom + 'px' }">
             {{ true ? '没有更多数据~' : '正在加载...' }}
           </view>
         </scroll-view>
@@ -127,8 +103,8 @@ page {
 
 .viewport {
   height: 100%;
-  display: flex;
   white-space: nowrap;
+  display: flex;
   flex-direction: column;
   background-color: #fff;
 }
@@ -186,31 +162,6 @@ page {
 
     &:last-child {
       padding-bottom: 40rpx;
-    }
-  }
-
-  .status {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 28rpx;
-    color: #999;
-    margin-bottom: 15rpx;
-
-    .date {
-      color: #666;
-      flex: 1;
-    }
-
-    .primary {
-      color: #ff9240;
-    }
-
-    .icon-delete {
-      line-height: 1;
-      margin-left: 10rpx;
-      padding-left: 10rpx;
-      border-left: 1rpx solid #e3e3e3;
     }
   }
 
@@ -296,36 +247,6 @@ page {
 
     .symbol {
       font-size: 20rpx;
-    }
-  }
-
-  .action {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    padding-top: 20rpx;
-
-    .button {
-      width: 180rpx;
-      height: 60rpx;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-left: 20rpx;
-      border-radius: 60rpx;
-      border: 1rpx solid #ccc;
-      font-size: 26rpx;
-      color: #444;
-    }
-
-    .secondary {
-      color: #27ba9b;
-      border-color: #27ba9b;
-    }
-
-    .primary {
-      color: #fff;
-      background-color: #27ba9b;
     }
   }
 

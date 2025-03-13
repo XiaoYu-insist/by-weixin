@@ -1,88 +1,69 @@
 <script setup lang="ts">
+import { onLoad } from '@dcloudio/uni-app';
 import { ref } from 'vue';
-import { onReady } from '@dcloudio/uni-app';
 
 interface ErrorItem {
-  id: number;
-  title: string;
-  description: string;
+  userId: string;
+  deviceId: string;
+  house: string;
+  failtype: string;
+  icon: string
 }
 
 // 响应式数据
 const errorList = ref<ErrorItem[]>([]);
 const loading = ref(false);
-const page = ref(1);
-const pageSize = 10;
 
-// 初始化加载数据
-const loadData = async (page: number) => {
-  loading.value = true;
-
-  // 模拟接口请求
-  setTimeout(() => {
-    const newData: ErrorItem[] = Array.from({ length: pageSize }, (_, i) => ({
-      id: Date.now() + i,
-      title: `操作失败 ${(page - 1) * pageSize + i + 1}`,
-      description: '这里显示具体的错误描述信息，可以显示多行内容'
-    }));
-
-    if (page === 1) {
-      errorList.value = newData;
-    } else {
-      errorList.value = [...errorList.value, ...newData];
-    }
-
-    loading.value = false;
-  }, 1000);
-};
-
-// 加载更多
-const loadMore = () => {
-  if (loading.value) return;
-  page.value += 1;
-  loadData(page.value);
-};
-
-// 删除项目
-const deleteItem = (index: number) => {
-  uni.showModal({
-    title: '提示',
-    content: '确定要删除这条记录吗？',
-    success: (res) => {
-      if (res.confirm) {
-        errorList.value.splice(index, 1);
-        uni.showToast({ title: '删除成功', icon: 'success' });
-      }
-    }
-  });
-};
-
-
-// 初始化加载
-onReady(() => {
-  loadData(1);
-});
+const data: ErrorItem[] = [
+  {
+    userId: "41354011254",
+    deviceId: "745274272727",
+    house: "什么",
+    failtype: "采集失败",
+    icon: 'icon-dianbiao'
+  }, {
+    userId: "45378383453",
+    deviceId: "78378378572453",
+    house: "电脑",
+    failtype: "采集失败",
+    icon: 'icon-lengshuibiao'
+  },
+  {
+    userId: "15343573",
+    deviceId: "3987375375375",
+    house: "手机",
+    failtype: "采集失败",
+    icon: 'icon-reshuibiao1'
+  },
+]
+onLoad(() => {
+  errorList.value = data
+})
 </script>
 
 <template>
   <!-- 失败列表 -->
-  <scroll-view scroll-y @scrolltolower="loadMore">
+  <scroll-view scroll-y>
     <view class="error-list">
       <!-- 空状态 -->
       <view v-if="errorList.length === 0" class="empty-container">
-        <text class="empty-text">暂无失败记录</text>
+        <text class="empty7-text">暂无失败记录</text>
       </view>
 
       <!-- 列表内容 -->
-      <view v-for="(item, index) in errorList" :key="item.id" class="error-item">
-        <view class="item-left">
-          <text class="error-title">{{ item.title }}</text>
-          <text class="error-desc">{{ item.description }}</text>
-        </view>
+      <view v-for="item,  in errorList" :key="item.userId" class="error-item">
+        <view class="item-detailed">
+          <view class="icon-wrapper icon-shibai"> </view>
+          <view class="error-device">
+            <view class="error-title">{{ item.house }}</view>
+            <view class="error-text">
+              <text class="error-desc">编号:{{ item.userId }}</text>
+              <text class="error-desc">表号:{{ item.deviceId }}</text>
+              <text class="error-desc error-states">失败:{{ item.failtype }}</text>
+              <view class="surface-icon" :class="item.icon"></view>
+            </view>
 
-        <!-- 删除按钮 -->
-        <view class="item-right" @click="deleteItem(index)">
-          <uni-icons type="trash" size="24" color="#999" />
+          </view>
         </view>
       </view>
       <!-- 加载状态 -->
@@ -98,82 +79,119 @@ onReady(() => {
 .error-list {
   border-radius: 12rpx;
   padding: 30rpx;
-}
 
-.error-item {
-  display: flex;
-  align-items: center;
-  margin: 20rpx 0;
-  padding: 30rpx;
-  border-radius: 25rpx;
-  background-color: #fff;
+  .empty-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 100rpx 0;
 
-
-  &:last-child {
-    border-bottom: none;
-  }
-}
-
-.item-left {
-  flex: 1;
-  margin-right: 20rpx;
-}
+    .empty-text {
+      color: #999;
+      font-size: 28rpx;
+    }
 
 
-.error-title {
-  font-size: 32rpx;
-  color: #333;
-  font-weight: bold;
-  margin-bottom: 10rpx;
-}
-
-.error-desc {
-  font-size: 28rpx;
-  color: #666;
-  line-height: 1.5;
-}
-
-.item-right {
-  padding: 20rpx;
-}
-
-.empty-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 100rpx 0;
-}
-
-
-.empty-text {
-  color: #999;
-  font-size: 28rpx;
-}
-
-.loading-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 30rpx 0;
-}
-
-.loading-icon {
-  animation: rotate 1s linear infinite;
-  margin-right: 10rpx;
-}
-
-@keyframes rotate {
-  from {
-    transform: rotate(0deg);
   }
 
-  to {
-    transform: rotate(360deg);
-  }
-}
+  .error-item {
+    display: flex;
+    align-items: center;
+    margin: 20rpx 0;
+    padding: 30rpx;
+    border-radius: 25rpx;
+    background-color: #fff;
 
-.loading-text {
-  color: #007AFF;
-  font-size: 28rpx;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    /** 失败列表详细数据 */
+    .item-detailed {
+      display: flex;
+      margin-right: 20rpx;
+      width: 100%;
+
+      .icon-wrapper {
+        width: 150rpx;
+        height: 150rpx;
+        border-radius: 40rpx;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 100rpx;
+      }
+
+      .error-device {
+        width: 100%;
+        margin-left: 10rpx;
+        padding-left: 20rpx;
+        border-left: 1px solid #EBEBEB;
+
+        .error-title {
+          font-size: 30rpx;
+          color: #333;
+          font-weight: bold;
+          margin-bottom: 5rpx;
+          padding-bottom: 5rpx;
+          border-bottom: 1px solid #EBEBEB;
+        }
+
+        .error-text {
+          position: relative;
+
+          .error-desc {
+            display: block;
+            font-size: 24rpx;
+            color: #999;
+            line-height: 1.5;
+          }
+
+          .error-states {
+            color: LightCoral;
+          }
+
+          .surface-icon {
+            position: absolute;
+            display: inline-block;
+            font-size: 80rpx;
+            right: 0;
+            bottom: 0;
+          }
+        }
+      }
+
+    }
+
+  }
+
+  .loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 30rpx 0;
+
+    .loading-icon {
+      animation: rotate 1s linear infinite;
+      margin-right: 10rpx;
+    }
+
+    @keyframes rotate {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .loading-text {
+      color: #007AFF;
+      font-size: 28rpx;
+    }
+  }
+
 }
 </style>

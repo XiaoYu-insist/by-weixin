@@ -1,9 +1,9 @@
 @font-face {
   font-family: 'iconfont';  /* Project id 4838069 */
   src:
-       url('//at.alicdn.com/t/c/font_4838069_03qt2oq0s94v.woff2?t=1741568337613') format('woff2'),
-       url('//at.alicdn.com/t/c/font_4838069_03qt2oq0s94v.woff?t=1741568337613') format('woff'),
-       url('//at.alicdn.com/t/c/font_4838069_03qt2oq0s94v.ttf?t=1741568337613') format('truetype');
+       url('//at.alicdn.com/t/c/font_4838069_brn5zm7i0pn.woff2?t=1741852457982') format('woff2'),
+       url('//at.alicdn.com/t/c/font_4838069_brn5zm7i0pn.woff?t=1741852457982') format('woff'),
+       url('//at.alicdn.com/t/c/font_4838069_brn5zm7i0pn.ttf?t=1741852457982') format('truetype');
 }
 [class^='icon-'],
 [class*=' icon-'] {
@@ -12,6 +12,14 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-weixin:before {
+  content: "\e856";
+}
+
+.icon-shibai:before {
+  content: "\e7b4";
 }
 
 .icon-kongxinwenhao:before {
@@ -165,4 +173,3 @@
 .icon-dianbiao-tishi:before {
   content: "\e710";
 }
-
