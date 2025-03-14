@@ -40,7 +40,7 @@ export const hotwater = {
 
 // 门锁数据
 export const doorlocks = {
-  Name: '热表', //名称
+  Name: '门锁', //名称
   DeviceId: ' 7688673737853', // 编号
   Permanent: '123456', // 密码
   Temporary: '' //临时密码

@@ -1,10 +1,8 @@
 <script setup lang="ts">
-import { ref, watch, watchEffect } from 'vue'
+import { ref } from 'vue'
 
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getWindowInfo()
-// 获取屏幕宽度
-const windowWidth = uni.getWindowInfo().safeArea.width
 
 // tabs 数据
 const orderTabs = ref([
@@ -21,71 +19,44 @@ const orderTabs = ref([
 const query = defineProps<{
   type: string
 }>()
-// 高亮下标
-const activeIndex = ref(orderTabs.value.findIndex((v) => v.orderState === Number(query.type)))
-// 在 script 中添加
-const cursorWidth = ref(0)    // 游标宽度
-const cursorLeft = ref(0)     // 游标左侧位置
-const scrollLeft = ref(0)     // 滚动条位置
 
-// 修改后的游标位置计算
-const updateCursorPosition = () => {
-  uni.createSelectorQuery()
-    .selectAll('.tabs .item')
-    .boundingClientRect(rects => {
-      const rectArray = rects as UniApp.NodeInfo[]
-      if (!rectArray || activeIndex.value >= rectArray.length) return
+const tab = ref(0)
 
-      const activeRect = rectArray[activeIndex.value]
-      cursorWidth!.value = activeRect.width!
-      cursorLeft.value = activeRect.left! - 10 // 10px 是容器的 padding
-      scrollLeft.value = activeRect.left! - windowWidth / 3 + activeRect.width!
-    })
-    .exec()
-}
-// 监听 activeIndex 变化
-watch(activeIndex, () => {
-  updateCursorPosition()
-  console.log(uni.getWindowInfo())
-})
 </script>
 
 <template>
   <view class="viewport">
     <!-- tabs -->
-    <view class="tabs">
-      <scroll-view scroll-x :scroll-left="scrollLeft" scroll-with-animation :scroll-animation-duration="300"
-        :show-scrollbar="false" class="custom-scroll">
-        <text class="item" v-for="(item, index) in orderTabs" :key="item.title" @tap="activeIndex = index"
-          :class="{ active: activeIndex === item.orderState }"> {{ item.title }}
-        </text>
-      </scroll-view>
-    </view>
+    <wd-tabs v-model="tab" slidable="always" swipeable>
+      <block v-for="item in orderTabs" :key="item.orderState">
+        <wd-tab :title="item.title">
+        </wd-tab>
+      </block>
+    </wd-tabs>
     <!-- 滑动容器 -->
-    <swiper class="swiper" :current="activeIndex" @change="activeIndex = $event.detail.current">
+    <swiper class="swiper" :current="tab" @change="tab = $event.detail.current">
       <!-- 滑动项 -->
-      <swiper-item v-for="item in orderTabs" :key="item.orderState">
+      <swiper-item v-for="item in orderTabs" :key="item.title">
         <!-- 订单列表 -->
         <scroll-view scroll-y class="orders">
-          <view class="card" v-for="item in 8" :key="item">
-            <!-- 商品信息，点击商品跳转到订单详情，不是商品详情 -->
+          <view class="card" v-for="item in 10" :key="item">
+            <view class="header">
+              <view class="icons" :class="item % 2 === 0 ? 'icon-qiyong' : 'icon-tingyong'"></view>
+              <view class="type">啊手机都放辣椒收到啦放假啦 </view>
+            </view>
+            <!-- 订单信息 -->
             <navigator v-for="sku in 1" :key="sku" class="goods" :url="`/pagesOrder/detail/detail?id=1`"
               hover-class="none">
-              <view class="cover">
-                <image mode="aspectFit" src="https://yanxuan-item.nosdn.127.net/c07edde1047fa1bd0b795bed136c2bb2.jpg">
-                </image>
+              <view class="cover icon-dianbiao">
               </view>
               <view class="meta">
-                <view class="name ellipsis">ins风小碎花泡泡袖衬110-160cm</view>
-                <view class="type">藏青小花 130</view>
+                <view class="name">名称:小碎花泡泡袖</view>
+                <view class="id">表号:1354384116841</view>
+              </view>
+              <view class="payment">
+                <text class="symbol">¥-991566.16</text>
               </view>
             </navigator>
-            <!-- 支付信息 -->
-            <view class="payment">
-              <text class="quantity">共5件商品</text>
-              <text>实付</text>
-              <text class="amount"> <text class="symbol">¥</text>99</text>
-            </view>
           </view>
           <!-- 底部提示文字 -->
           <view class="loading-text" :style="{ paddingBottom: safeAreaInsets?.bottom + 'px' }">
@@ -99,62 +70,25 @@ watch(activeIndex, () => {
 
 <style lang="scss">
 page {
-  height: 100%;
   overflow: hidden;
 }
 
 .viewport {
   height: 100%;
-  white-space: nowrap;
   display: flex;
   flex-direction: column;
-  background-color: #fff;
-}
 
-// tabs
-.tabs {
-  display: flex;
-  justify-content: space-around;
-  line-height: 60rpx;
-  margin: 20rpx 10rpx;
-  background-color: #fff;
-  box-shadow: 0 4rpx 6rpx rgba(240, 240, 240, 0.6);
-  position: relative;
-  z-index: 9;
-
-  .item {
-    flex: 1;
-    text-align: center;
-    padding: 20rpx;
-    font-size: 28rpx;
-    color: #999;
-
+  .center {
+    height: 100%;
+    line-height: 100%;
   }
 
-  /* 隐藏滚动条 */
-  .custom-scroll ::-webkit-scrollbar {
-    display: none;
-  }
-
-  /* 适配小程序的 enhanced 模式 */
-  .custom-scroll {
-    --scrollbar-width: 0;
-  }
-}
-
-.active {
-  background-color: #b6e7dd;
-  border-radius: 25%;
-  color: #262626 !important;
-}
-
-// swiper
-.swiper {
-  background-color: #f7f7f8;
 }
 
 // 订单列表
 .orders {
+  height: 100%;
+
   .card {
     min-height: 100rpx;
     padding: 20rpx;
@@ -165,15 +99,40 @@ page {
     &:last-child {
       padding-bottom: 40rpx;
     }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      .icons {
+        font-size: 40rpx;
+      }
+
+      .type {
+        line-height: 1.8;
+        padding: 0 15rpx;
+        margin-top: 10rpx;
+        font-size: 24rpx;
+        align-self: flex-start;
+        border-radius: 4rpx;
+        color: #888;
+        background-color: #f7f7f8;
+      }
+    }
   }
 
   .goods {
     display: flex;
-    margin-bottom: 20rpx;
+    margin-top: 20rpx;
 
     .cover {
+      display: flex;
+      align-items: center;
+      justify-content: center;
       width: 170rpx;
       height: 170rpx;
+      font-size: 100rpx;
       margin-right: 20rpx;
       border-radius: 10rpx;
       overflow: hidden;
@@ -199,21 +158,10 @@ page {
       justify-content: center;
     }
 
-    .name {
-      height: 80rpx;
+
+    .id {
       font-size: 26rpx;
       color: #444;
-    }
-
-    .type {
-      line-height: 1.8;
-      padding: 0 15rpx;
-      margin-top: 10rpx;
-      font-size: 24rpx;
-      align-self: flex-start;
-      border-radius: 4rpx;
-      color: #888;
-      background-color: #f7f7f8;
     }
 
     .more {
@@ -224,33 +172,24 @@ page {
       font-size: 22rpx;
       color: #333;
     }
-  }
 
-  .payment {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    line-height: 1;
-    padding: 20rpx 0;
-    text-align: right;
-    color: #999;
-    font-size: 28rpx;
-    border-bottom: 1rpx solid #eee;
+    .payment {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      line-height: 1;
+      padding: 20rpx 0;
+      text-align: right;
+      color: #8D97AB;
+      font-size: 28rpx;
 
-    .quantity {
-      font-size: 24rpx;
-      margin-right: 16rpx;
-    }
-
-    .amount {
-      color: #444;
-      margin-left: 6rpx;
-    }
-
-    .symbol {
-      font-size: 20rpx;
+      .symbol {
+        margin-top: 50rpx;
+      }
     }
   }
+
+
 
   .loading-text {
     text-align: center;
@@ -258,5 +197,19 @@ page {
     color: #666;
     padding: 20rpx 0;
   }
+}
+
+:deep(.wd-tabs__nav--wrap>.data-v-c72f40b5 ::-webkit-scrollbar) {
+  display: none !important;
+}
+
+/* 适配小程序的 enhanced 模式 */
+:deep(.wd-tabs__nav--wrap>.data-v-c72f40b5) {
+  --scrollbar-width: 0 !important;
+}
+
+/* tab 标签底部颜色 */
+:deep(.wd-tabs__line.data-v-c72f40b5) {
+  background-color: #3AAE98 !important;
 }
 </style>

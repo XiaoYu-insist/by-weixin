@@ -72,8 +72,7 @@ onLoad(() => {
     <view class="header">
       <uni-data-select class="data-select" v-model="value" :localdata="ranges" :clear="false" @change="onchange"
         v-if="query.states"></uni-data-select>
-      <uni-datetime-picker v-if="query.type == 0" :end="today" v-model="range" type="daterange" :clear-icon="false"
-        @change="maskClick" />
+      <uni-datetime-picker v-if="query.type == 0" type="daterange" :clear-icon="false" @change="maskClick" />
     </view>
 
     <!-- 账单列表 -->
