@@ -6,8 +6,8 @@
 			"^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue",
 			// 自动导入组件
 			"^BY(.*)": "@/components/BY$1.vue",
-      //wot-design-uni 自动导入
-      "^wd-(.*)": "wot-design-uni/components/wd-$1/wd-$1.vue"
+			//wot-design-uni 自动导入
+			"^wd-(.*)": "wot-design-uni/components/wd-$1/wd-$1.vue"
 		}
 	},
 	"pages": [

@@ -22,7 +22,7 @@ const switchLogin = ref(false)
 
       <!-- 小程序端授权登录 -->
       <view v-else>
-        <button class="button phone">
+        <button class="button phone" @tap="">
           手机号快捷登录
         </button>
       </view>

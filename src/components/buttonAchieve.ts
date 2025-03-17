@@ -1,3 +1,4 @@
+import { http } from "@/utils/http";
 import { ref } from "vue";
 
 /*处理按钮*/
@@ -23,6 +24,8 @@ export const setButtonTypeProcess = (DeviceId:number,butType:number,popup:any)=>
           })
           break;
       case 2:
+        const res = getDatas()
+        console.log(res)
           //关闭
           break;
       case 3:
@@ -64,3 +67,12 @@ export const setButtonTypeProcess = (DeviceId:number,butType:number,popup:any)=>
   }
 }
 
+
+// 测试
+const getDatas = ()=>{
+  return http({
+    method:'GET',
+    url:'/App_Api/srts',
+    data:{cmd:'get_nb_log',par1:'000001'}
+  })
+}

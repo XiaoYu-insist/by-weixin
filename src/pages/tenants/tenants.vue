@@ -18,16 +18,25 @@ const handleDeviceClick = (device: any, room: any) => {
 //     icon: 'none'
 //   });
 // };
-
+/* 扫描二维码 或者 条形码 */
+const onScanCode = () => {
+  uni.scanCode({
+    success: function (res) {
+      console.log('条码类型：' + res.scanType);
+      console.log('条码内容：' + res.result);
+    }
+  })
+}
 </script>
-
+z
 <template>
   <view class="container" :style="{ paddingTop: safeArea!.top + 'px' }">
     <text class="tenants-name">租户</text>
     <!-- 搜索栏 -->
     <view class="search-bar">
-      <uni-icons type="search" size="20" color="#999" />
+      <uni-icons type="scan" size="20" color="#999" @tap="onScanCode" />
       <input type="text" placeholder="搜索设备名称/编号/房间号" class="search-input" v-model="searchText" />
+      <uni-icons type="search" size="20" color="#999" />
     </view>
     <!-- 设备列表 -->
     <scroll-view class="device-list" scroll-y>
