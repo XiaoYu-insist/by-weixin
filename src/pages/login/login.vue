@@ -1,9 +1,50 @@
 <script setup lang="ts">
 
+import { postSubAccountloginAPI } from '@/services/login';
 import { ref } from 'vue';
 
-//
+// 登陆按钮切换
 const switchLogin = ref(false)
+const phones = ref('') // 账号
+const passwords = ref('') // 密码
+/**
+ * 微信快捷登录
+ */
+const wxlogin = () => {
+  wx.login({
+    success(res) {
+      if (res.code) {
+        wx.request<WechatMiniprogram.RequestTask>({
+          method: 'GET',
+          url: 'https://api.weixin.qq.com/sns/jscode2session',
+          data: {
+            appid: 'wx8159d7addde949df',
+            secret: 'c0cb264df05b6574ecfda8ddfdfb0eae',
+            js_code: res.code,
+            grant_type: 'authorization_code'
+          },
+          success: (res) => {
+            console.log("获取成功", res.data)
+          }
+        })
+
+        // await getOpenidLoginAPI({cmd:'WeChat_openid',openid:})
+      }
+    }
+  })
+}
+
+/**
+ * 账号密码登录
+ */
+const accountlogin = async () => {
+  const res = await postSubAccountloginAPI({
+    cmd: 'login_btn_wz',
+    phone: phones.value,
+    pass: passwords.value
+  })
+  console.log(res)
+}
 </script>
 
 <template>
@@ -14,15 +55,15 @@ const switchLogin = ref(false)
     <view class="login">
       <!-- 网页端表单登录 -->
       <view v-if="switchLogin">
-        <input class="input" type="text" placeholder="请输入用户名/手机号码" />
-        <input class="input" type="text" password placeholder="请输入密码" />
-        <button class="button phone">登录</button>
+        <input class="input" type="text" v-model="phones" placeholder="请输入用户名/手机号码" />
+        <input class="input" type="text" v-model="passwords" password placeholder="请输入密码" />
+        <button class="button phone" @tap="accountlogin">登录</button>
       </view>
 
 
       <!-- 小程序端授权登录 -->
       <view v-else>
-        <button class="button phone" @tap="">
+        <button class="button phone" @tap="wxlogin">
           手机号快捷登录
         </button>
       </view>

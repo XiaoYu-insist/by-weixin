@@ -8,4 +8,14 @@ export default defineConfig({
     sourcemap: process.env.NODE_ENV === 'development',
   },
   plugins: [uni()],
+  server: {
+    proxy: {
+      // 代理配置
+      '/WeChat_Api': {
+        target: 'http://www.boyun.club:8080', // 后端接口地址
+        changeOrigin: true, // 允许跨域
+        rewrite: (path) => path.replace(/^\/WeChat_Api/, ''), // 重写路径（可选）
+      },
+    },
+  },
 })

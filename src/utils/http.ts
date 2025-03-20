@@ -24,12 +24,12 @@ const httpInterceptor = {
       ...options.header
     }
     // 添加 token
-    // const memberStore = useMemberStore()
-    // const token = memberStore
-    // if(token){
-    //   options.header.Authorization = token
-    // }
-    options.header.token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJVc2VyTmFtZSI6IjE1ODgwODM1MDA4IiwiVXNlclB3ZCI6ImExMjM0NTYuIiwiQXBwUG93ZXIiOiIxMjMiLCJSZWdpb24iOiIiLCJleHAiOjM0ODQwNDg0NTQ0fQ.K-bz3ERPeRr46BUGRHoMQZ-RiUlIunoe5HAjKTVpKVg'
+    const memberStore = useMemberStore()
+    const token = memberStore
+    if(token){
+      options.header.token = token
+    }
+    // options.header.token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJVc2VyTmFtZSI6IjE1ODgwODM1MDA4IiwiVXNlclB3ZCI6ImExMjM0NTYuIiwiQXBwUG93ZXIiOiIxMjMiLCJSZWdpb24iOiIiLCJleHAiOjM0ODQwNDg0NTQ0fQ.K-bz3ERPeRr46BUGRHoMQZ-RiUlIunoe5HAjKTVpKVg'
 
   }
 }
