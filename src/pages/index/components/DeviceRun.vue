@@ -1,3 +1,15 @@
+<script setup lang="ts">
+
+import type { onRegionUserState } from '@/types/region';
+import { onMounted } from 'vue';
+defineProps<{
+  listUser: onRegionUserState,
+  collectorCount: number,
+  deviceFailCount: number
+}>()
+onMounted(() => {
+})
+</script>
 <template>
   <view class="house-status-card">
     <view class="card-header">
@@ -6,19 +18,19 @@
     <view class="status-chart">
       <navigator url="/pageDataList/tenantsList/tenantsList" hover-class="none" class="chart-item">
         <view class="progress-circle">
-          <view class="number">12</view>
+          <view class="number">{{ listUser?.zhs || 0 }}</view>
         </view>
         <view class="label">总租户</view>
       </navigator>
       <navigator url="/pageDataList/Collector/Collector" hover-class="none" class="chart-item">
         <view class="progress-circle vacant">
-          <view class="number">2</view>
+          <view class="number">{{ collectorCount || 0 }}</view>
         </view>
         <view class="label">采集器</view>
       </navigator>
       <navigator url="/pageDataList/failData/failData" hover-class="none" class="chart-item">
         <view class="progress-circle maintenance">
-          <view class="number">1</view>
+          <view class="number">{{ deviceFailCount || 0 }}</view>
         </view>
         <view class="label">失败数</view>
       </navigator>

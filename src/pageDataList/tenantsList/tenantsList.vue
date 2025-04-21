@@ -10,13 +10,9 @@ const orderTabs = ref([
   { orderState: 1, title: '欠费用户' },
   { orderState: 2, title: '停电用户' },
   { orderState: 3, title: '停水用户' },
-  { orderState: 4, title: '电表用户' },
-  { orderState: 5, title: '水表用户' },
-  { orderState: 6, title: '热表用户' },
-  { orderState: 7, title: '气表用户' },
 ])
 // 获取页面参数
-const query = defineProps<{
+defineProps<{
   type: string
 }>()
 
@@ -27,7 +23,7 @@ const tab = ref(0)
 <template>
   <view class="viewport">
     <!-- tabs -->
-    <wd-tabs v-model="tab" slidable="always" swipeable>
+    <wd-tabs v-model="tab">
       <block v-for="item in orderTabs" :key="item.orderState">
         <wd-tab :title="item.title">
         </wd-tab>

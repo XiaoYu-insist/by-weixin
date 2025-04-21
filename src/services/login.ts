@@ -1,23 +1,30 @@
-import type { SubAccountlogin, Subwxlogin } from "@/types/login"
+import type { Fun } from "@/types/global"
+import type { loginsuc, SubAccountlogin } from "@/types/login"
 import { http } from "@/utils/http"
 
+type LoginParams = Fun & {
+  code: string
+}
 /**
  * 使用微信登陆
  * @param data openid 查询
  */
-export const postOpenidLoginAPI = (data:Subwxlogin)=>{
+export const postOpenidLoginAPI = (data: LoginParams) => {
   return http({
-    method:'POST',
-    url:'/WeChat_Api/login',
+    method: 'GET',
+    url: '/WeChat_Api/login',
     data
   })
 }
 
-export const postSubAccountloginAPI =(data:SubAccountlogin)=>{
-  return http({
-    method:'POST',
-    // url:'/WeChat_Api/login',
-    url:'http://www.boyun.club/Comm_Api/api_data.ashx',
+/**
+ * 账号密码登录
+ * @param data 登录参数
+ */
+export const postSubAccountloginAPI = (data: SubAccountlogin) => {
+  return http<loginsuc>({
+    method: 'GET',
+    url: '/WeChat_Api/login',
     data
   })
 }

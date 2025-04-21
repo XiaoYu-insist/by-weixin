@@ -1,7 +1,4 @@
-import { useMemberStore } from "@/stores"
-
-
-
+import { useReginStore } from "@/stores"
 
 
 // 请求基地址
@@ -24,8 +21,8 @@ const httpInterceptor = {
       ...options.header
     }
     // 添加 token
-    const memberStore = useMemberStore()
-    const token = memberStore
+    const regionStore = useReginStore()
+    const token = regionStore.token
     if(token){
       options.header.token = token
     }
@@ -44,7 +41,9 @@ uni.addInterceptor('uploadFile', httpInterceptor)
 type Data<T>={
   state:string,
   count:number
-  Table:T,
+  Table?:T,
+  token?:string,
+  rows?:T,
 
 }
 
@@ -61,18 +60,14 @@ export const http = <T>(options:UniApp.RequestOptions)=>{
           // 提取核心数据
           const result = res.data as Data<T>
           if(result.state === '0000'){
-            resolve(result.Table as Data<T>)
-          }else if(result.state === '4001'){
-            const memberStore = useMemberStore()
-            memberStore.clearProfile()
-            uni.navigateTo({ url: '/pages/login/login' })
-          }else {
+              resolve(result as Data<T>)
+          } else {
             resolve(result)
           }
           // 状态码 4001 重新登录
         }else if (res.statusCode === 401 ){
-          const memberStore = useMemberStore()
-          memberStore.clearProfile()
+          const reginStore = useReginStore()
+          reginStore.clearAll()
           uni.navigateTo({ url: '/pages/login/login' })
           reject(res)
         }else {

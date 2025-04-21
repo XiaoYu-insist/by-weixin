@@ -43,9 +43,9 @@ const handleCollectorDetail = (collector: any) => {
 };
 
 const handleRefresh = (collector: any) => {
-  uni.showLoading({
-    title: "刷新中...",
-  });
+  // uni.showLoading({
+  //   title: "刷新中...",
+  // });
 
   setTimeout(() => {
     uni.hideLoading();
@@ -99,7 +99,7 @@ const handleSettings = (collector: any) => {
                 <view class="name-row">
                   <text class="name">{{ collector.name }}</text>
                   <text :class="['status', collector.status === '在线' ? 'active' : 'inactive']">{{ collector.status
-                    }}</text>
+                  }}</text>
                 </view>
                 <text class="device-id">设备ID: {{ collector.deviceId }}</text>
                 <text class="location">{{ collector.location }}</text>

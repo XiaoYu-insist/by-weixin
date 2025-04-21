@@ -1,21 +1,30 @@
 <script lang="ts" setup>
+import { useReginStore } from '@/stores';
 const { safeArea } = uni.getWindowInfo()
+const regionStore = useReginStore()
 </script>
 <template>
   <view class="page" :style="{ paddingTop: safeArea!.top + 'px' }">
     <!-- 个人资料 -->
     <view class="profile">
       <!-- 情况1：已登录 -->
-      <view class="overview" v-if="true">
+      <view class="overview" v-if="regionStore.regionId">
         <view class="meta">
-          <view class="nickname"> 你好 </view>
-          <navigator class="extra" url="/pagesMember/profile/profile" hover-class="none">
-            <text class="update">欢迎使用泊云社区</text>
-          </navigator>
+          <view class="nickname"> {{ regionStore.regionName }} </view>
+          <view class="extra">
+            <text class="update">{{ "区域编号：" + regionStore.regionId }}</text>
+          </view>
         </view>
       </view>
       <!-- 情况2：未登录 -->
-
+      <navigator class="overview" url="/pages/login/login" hover-class="none" v-else>
+        <view class="meta">
+          <view class="nickname">您好</view>
+          <view class="extra">
+            <text class="update">欢迎使用泊云社区</text>
+          </view>
+        </view>
+      </navigator>
     </view>
   </view>
 </template>

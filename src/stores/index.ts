@@ -11,4 +11,5 @@ pinia.use(piniaPluginPersistedstate) //pinia插件的安装配置（千万别忘
 export default pinia
 
 // 模块统一导出
-export * from './modules/member'
+export * from './modules/region'
+export * from './modules/wxOpenid'

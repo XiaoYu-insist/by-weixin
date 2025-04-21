@@ -1,20 +1,28 @@
+<script setup lang="ts">
+
+import type { onIncomeInfo } from '@/types/region';
+
+defineProps<{
+  list: onIncomeInfo
+}>()
+</script>
 <template>
   <view class="meter-card">
     <navigator :url="`/pageDataList/exhibitList/exhibitList?type=${0}`" hover-class="none" class="meter-info">
       <view class="meter-title">当月收入金额</view>
       <view class="meter-reading">
-        <text class="number">3426.8</text>
+        <text class="number">{{ list?.money || 0 }}</text>
         <text class="unit">元</text>
       </view>
     </navigator>
     <view class="usage-stats">
       <navigator :url="`/pageDataList/exhibitList/exhibitList?type=${1}`" hover-class="none" class="stat-item">
         <text class="label">今日充值</text>
-        <text class="value">2笔</text>
+        <text class="value">{{ list?.count || 0 }}笔</text>
       </navigator>
       <navigator :url="`/pageDataList/exhibitList/exhibitList?type=${2}`" hover-class="none" class="stat-item">
         <text class="label">今日收入</text>
-        <text class="value increase">300元</text>
+        <text class="value increase">{{ list?.money || 0 }}元</text>
       </navigator>
     </view>
   </view>

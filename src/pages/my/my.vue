@@ -1,7 +1,8 @@
 <script lang="ts" setup>
-
+import { useReginStore, useCodeStore } from '@/stores';
 const { safeArea } = uni.getWindowInfo()
-
+const regionStore = useReginStore()
+const codeStore = useCodeStore()
 const handleLogout = () => {
   uni.showModal({
     title: "提示",
@@ -13,6 +14,8 @@ const handleLogout = () => {
           icon: "success",
           duration: 2000,
         });
+        regionStore.clearAll()
+        codeStore.clearCodes()
         setTimeout(() => {
           uni.reLaunch({
             url: "/pages/login/login",
@@ -27,11 +30,11 @@ const handleLogout = () => {
   <view class="head" :style="{ paddingTop: safeArea!.top + 'px' }">
     <!-- 用户信息区域 -->
     <view class="user-section">
-      <view class="avatar-container">
+      <navigator class="avatar-container" hover-class="none" url="/pages/login/login">
         <image class="avatar" src="https://public.readdy.ai/ai/img_res/30826713d88cd23b9870782b01cdd83c.jpg"
           mode="aspectFill" />
         <view class="username">你好</view>
-      </view>
+      </navigator>
     </view>
 
     <!-- 功能列表 -->

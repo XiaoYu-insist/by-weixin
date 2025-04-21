@@ -1,18 +1,21 @@
 import type { Fun } from "./global";
 
-/**
- * 提交微信小程序参数
- */
-export type Subwxlogin = Fun & {
-  openid:stiring; // 微信小程序 获取
-}
-
 
 /**
  * 账号密码登陆
  */
+export type SubAccountlogin = Fun & {
+  phone: string, // 账号（手机号）
+  pass: string   // 密码（修复了拼写错误：strin -> string）
+  code?:string // 用于使用code获取小程序openid
+}
 
-export type SubAccountlogin = Fun &{
-  phone:string, // 账号 （手机号）
-  pass:strin    // 密码
+
+/**
+ *  登录后的数据
+ */
+
+export type loginsuc = {
+  state:string
+  token?:string,
 }
