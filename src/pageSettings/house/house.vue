@@ -1,35 +1,13 @@
 <script lang="ts" setup>
+import { getHoustUserAPI } from "@/services/house";
+import { useReginStore } from "@/stores";
+import type { onGetHouseUser } from "@/types/house";
+import { onLoad } from "@dcloudio/uni-app";
 import { ref } from "vue";
+const regionStore = useReginStore()
 
-const landlords = ref([
-  {
-    id: 1,
-    name: "张先生",
-    phone: "138****1234",
-    address: "北京市朝阳区建国路88号",
-    status: "活跃",
-    propertyCount: "2025-1-5",
-    rentedCount: "2015-10-15",
-  },
-  {
-    id: 2,
-    name: "李女士",
-    phone: "139****5678",
-    address: "北京市海淀区中关村大街1号",
-    status: "活跃",
-    propertyCount: "2021-8-3",
-    rentedCount: "2002-8-2",
-  },
-  {
-    id: 3,
-    name: "王先生",
-    phone: "137****9012",
-    address: "北京市西城区西长安街1号",
-    status: "不活跃",
-    propertyCount: "1357-5-2",
-    rentedCount: "1682-51-8",
-  },
-]);
+// 暂无数据
+const noData = ref(false)
 
 
 const handleMessage = (landlord: any) => {
@@ -53,32 +31,58 @@ const handleDel = (landlords: any) => {
     }
   })
 }
+
+// 管理人员
+const houseUser = ref<onGetHouseUser[]>()
+/**
+ * 获取区域管理人员
+ */
+const getHoustUserData = async () => {
+  noData.value = false
+  const res = await getHoustUserAPI({ cmd: 'get_bind_user_list', regionid: regionStore.regionId! })
+  if (res.state === '0000') {
+    houseUser.value = res.Table!.map(item => {
+      item.begin_date = item.begin_date.split(' ')[0]
+      item.end_date = item.end_date.split(' ')[0]
+      return item
+    })
+  } else {
+    noData.value = true
+  }
+}
+
+onLoad(() => {
+  getHoustUserData()
+})
 </script>
 <template>
-  <scroll-view class="content" scroll-y>
+  <view class="status-tip" v-if="noData">
+    <wd-status-tip image="search" tip="暂无数据" />
+  </view>
+  <scroll-view class="content" scroll-y v-else>
     <view class="section">
       <view class="landlord-list">
-        <view v-for="(landlord, index) in landlords" :key="index" class="landlord-card ">
+        <view v-for="(landlord, index) in houseUser" :key="index" class="landlord-card ">
           <view class="landlord-info">
             <image class="avatar" src="@/static/images/user.png" mode="aspectFill"></image>
             <view class="info-content">
               <view class="name-row">
-                <text class="name">{{ landlord.phone }}</text>
+                <text class="name">{{ landlord.appuser_phone }}</text>
               </view>
-              <text class="phone">{{ landlord.phone }}</text>
+              <text class="phone">{{ landlord.appuser_phone }}</text>
             </view>
-            <view class="action-buttons">
+            <!-- <view class="action-buttons">
               <uni-icons type="gear" size="24" color="#2196F3" @tap="handleMessage(landlord)" />
               <uni-icons type="close" color="#FF454A" size="24" @tap="handleDel(landlord)" />
-            </view>
+            </view> -->
           </view>
           <view class="property-info">
             <view class="property-stat">
-              <text class="property-count">{{ landlord.propertyCount }}</text>
+              <text class="property-count">{{ landlord.begin_date }}</text>
               <text class="property-label">起始日期</text>
             </view>
             <view class="property-stat">
-              <text class="property-count">{{ landlord.rentedCount }}</text>
+              <text class="property-count">{{ landlord.end_date }}</text>
               <text class="property-label">结束日期</text>
             </view>
           </view>
@@ -97,6 +101,18 @@ page {
   background-color: #f8f9fa;
 }
 
+.status-tip {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .wd-status-tip {
+    transform: translateY(-50%);
+  }
+}
+
 .content {
   flex: 1;
   overflow: auto;
@@ -105,11 +121,14 @@ page {
     padding: 30rpx;
 
     .landlord-card {
+      display: flex;
       background-color: #ffffff;
       border-radius: 16rpx;
       padding: 30rpx;
       margin-bottom: 20rpx;
       border-bottom: 1px solid #f0f0f0;
+      justify-content: space-between;
+      align-items: center;
 
       .landlord-info {
         display: flex;
@@ -157,7 +176,7 @@ page {
       }
 
       .property-info {
-        display: flex;
+        // display: flex;
         align-items: center;
         gap: 30rpx;
 
@@ -165,10 +184,10 @@ page {
           display: flex;
           flex-direction: column;
           gap: 6rpx;
+          padding: 10rpx 0;
 
           .property-count {
-            font-size: 16px;
-            font-weight: 500;
+            font-size: 26rpx;
             color: #333333;
           }
 

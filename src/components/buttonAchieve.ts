@@ -1,8 +1,17 @@
+import { ammeter } from "@/data/deviceData/deviceIfon";
+import { getUserInfoAPI } from "@/services/device";
 import { http } from "@/utils/http";
 import { ref } from "vue";
 
 /*处理按钮*/
 export const loading = ref(false)
+
+
+export const getUserInfoData = async (id:string) => {
+  const res = await getUserInfoAPI({ cmd: 'get_user_info', userId: id })
+  ammeter.DeviceId =  res.Table![0].watthour_meter_id
+  return res.Table![0]
+}
 
 /**
  * 用于详细设备后的按钮功能
@@ -10,7 +19,7 @@ export const loading = ref(false)
  * @param butType 按下去按钮参数
  * @param popup 底部弹窗
  */
-export const setButtonTypeProcess = (DeviceId:number,butType:number,popup:any)=>{
+export const setButtonTypeProcess = (DeviceId:number,butType:number,popup?:any)=>{
   switch(butType)
   {
       /* 弹窗 loading */

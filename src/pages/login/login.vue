@@ -133,7 +133,14 @@ const accountlogin = async () => {
 
       // 登录成功后延迟跳转
       setTimeout(() => {
-        uni.switchTab({ url: '/pages/index/index' });
+        uni.switchTab({
+          url: '/pages/index/index',
+          success: () => {
+            let page = getCurrentPages().pop()
+            if (page == undefined || page == null) return;
+            page.onLoad!()
+          },
+        });
       }, 500);
     } else {
       // 登录失败处理

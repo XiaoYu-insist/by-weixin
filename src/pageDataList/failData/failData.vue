@@ -1,43 +1,34 @@
 <script setup lang="ts">
+import { failList } from '@/services/failData';
+import { useReginStore } from '@/stores';
+import type { failListRes } from '@/types/failData';
 import { onLoad } from '@dcloudio/uni-app';
 import { ref } from 'vue';
+const regionStore = useReginStore()
 
-interface ErrorItem {
-  userId: string;
-  deviceId: string;
-  house: string;
-  failtype: string;
-  icon: string
+// 暂无数据
+const noData = ref(false)
+// 响应式数据
+const errorList = ref<failListRes[]>([]);
+const loading = ref(false);
+const getfailListData = async () => {
+  noData.value = false
+  const res = await failList({ cmd: 'get_device_error_list', regionid: regionStore.regionId! })
+  if (res.state === '0000') {
+    errorList.value = res.Table!.map((item => {
+      item.task_ids = item.task_id === '3' ? '停电失败' : item.task_id === '6' ? '停水失败' : '采集失败'
+      item.icon = item.device_type === '0' ? 'icon-dianbiao' : item.device_type === '1' ? 'icon-lengshuibiao' : item.device_type === '2' ? 'icon-reshuibiao1' : ''
+      return item
+    }))
+  } else {
+    errorList.value = []
+    noData.value = true
+  }
 }
 
-// 响应式数据
-const errorList = ref<ErrorItem[]>([]);
-const loading = ref(false);
 
-const data: ErrorItem[] = [
-  {
-    userId: "41354011254",
-    deviceId: "745274272727",
-    house: "什么",
-    failtype: "采集失败",
-    icon: 'icon-dianbiao'
-  }, {
-    userId: "45378383453",
-    deviceId: "78378378572453",
-    house: "电脑",
-    failtype: "采集失败",
-    icon: 'icon-lengshuibiao'
-  },
-  {
-    userId: "15343573",
-    deviceId: "3987375375375",
-    house: "手机",
-    failtype: "采集失败",
-    icon: 'icon-reshuibiao1'
-  },
-]
-onLoad(() => {
-  errorList.value = data
+onLoad(async () => {
+  await getfailListData()
 })
 </script>
 
@@ -46,25 +37,22 @@ onLoad(() => {
   <scroll-view scroll-y>
     <view class="error-list">
       <!-- 空状态 -->
-      <view v-if="errorList.length === 0" class="empty-container">
-        <text class="empty7-text">暂无失败记录</text>
+      <view v-if="noData" class="status-tip">
+        <wd-status-tip image="search" tip="暂无数据" />
       </view>
-
       <!-- 列表内容 -->
-      <view v-for="item,  in errorList" :key="item.userId" class="error-item">
-        <view class="item-detailed">
+      <view v-else v-for="item, index in errorList" :key="index" class="error-item">
+        <navigator class="item-detailed" hover-class="none" :url="`/pages/device/device?id=${item.user_id}`">
           <view class="icon-wrapper icon-shibai"> </view>
           <view class="error-device">
-            <view class="error-title">{{ item.house }}</view>
+            <view class="error-title">{{ item.user_name }}-[{{ item.block_num }}]</view>
             <view class="error-text">
-              <text class="error-desc">编号:{{ item.userId }}</text>
-              <text class="error-desc">表号:{{ item.deviceId }}</text>
-              <text class="error-desc error-states">失败:{{ item.failtype }}</text>
+              <text class="error-desc">编号:{{ item.user_id }}</text>
+              <text class="error-desc">表号:{{ item.device_id }}</text>
               <view class="surface-icon" :class="item.icon"></view>
             </view>
-
           </view>
-        </view>
+        </navigator>
       </view>
       <!-- 加载状态 -->
       <view v-if="loading" class="loading-container">
@@ -80,18 +68,16 @@ onLoad(() => {
   border-radius: 12rpx;
   padding: 30rpx;
 
-  .empty-container {
+  .status-tip {
+    width: 100%;
+    height: 100%;
     display: flex;
-    flex-direction: column;
+    justify-content: center;
     align-items: center;
-    padding: 100rpx 0;
 
-    .empty-text {
-      color: #999;
-      font-size: 28rpx;
+    .wd-status-tip {
+      transform: translateY(50%);
     }
-
-
   }
 
   .error-item {
@@ -146,10 +132,6 @@ onLoad(() => {
             font-size: 24rpx;
             color: #999;
             line-height: 1.5;
-          }
-
-          .error-states {
-            color: LightCoral;
           }
 
           .surface-icon {

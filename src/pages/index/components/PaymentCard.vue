@@ -1,18 +1,50 @@
 <script setup lang="ts">
 
+import { getRegionMoneyIncomeInfo } from '@/services/region';
+import { useRecordStore, useReginStore } from '@/stores';
 import type { onIncomeInfo } from '@/types/region';
-
+import { onMounted, ref } from 'vue';
+const regionStore = useReginStore()
+const recordStore = useRecordStore()
 defineProps<{
-  list: onIncomeInfo
+  list: onIncomeInfo,
 }>()
-</script>
+// 区域月份收入信息
+const regionMoney = ref<number>(0)
+const regionMoneyIncomeInfoData = async (start: string, end: string) => {
+  const res = await getRegionMoneyIncomeInfo({
+    cmd: 'get_month_money', regionid: regionStore.regionId!,
+    startDate: start,
+    endDate: end,
+  })
+  if (res.state === '0000') {
+    regionMoney.value = res.Table!.reduce((sum, num) => Number(sum) + Number(num.order_amount), 0)
+  } else {
+    regionMoney.value = 0
+  }
+}
+const date = new Date()
+// 获取当前月份
+const year = date.getFullYear();
+// 获取当前月份
+const month = String(date.getMonth() + 1).padStart(2, '0');
+// 获取当前日期
+const day = String(date.getDate()).padStart(2, '0');
+const start = `${year}-${month}-01`;
+const end = `${year}-${month}-${day}`;
+onMounted(async () => {
+  await regionMoneyIncomeInfoData(start, end)
+})
+
+</script>q
 <template>
   <view class="meter-card">
-    <navigator :url="`/pageDataList/exhibitList/exhibitList?type=${0}`" hover-class="none" class="meter-info">
+    <navigator :url="`/pageDataList/exhibitList/exhibitList?type=${0}&starttime=${start}&endtime=${end}`"
+      hover-class="none" class="meter-info">
       <view class="meter-title">当月收入金额</view>
       <view class="meter-reading">
-        <text class="number">{{ list?.money || 0 }}</text>
-        <text class="unit">元</text>
+        <wd-count-to class="number" :startVal="0" :decimals="2" :endVal="regionMoney" :fontSize="32" suffix="元"
+          color="#fff"></wd-count-to>
       </view>
     </navigator>
     <view class="usage-stats">
@@ -20,7 +52,7 @@ defineProps<{
         <text class="label">今日充值</text>
         <text class="value">{{ list?.count || 0 }}笔</text>
       </navigator>
-      <navigator :url="`/pageDataList/exhibitList/exhibitList?type=${2}`" hover-class="none" class="stat-item">
+      <navigator :url="`/pageDataList/exhibitList/exhibitList?type=${1}`" hover-class="none" class="stat-item">
         <text class="label">今日收入</text>
         <text class="value increase">{{ list?.money || 0 }}元</text>
       </navigator>
@@ -54,10 +86,7 @@ defineProps<{
       font-weight: bold;
     }
 
-    .meter-reading .unit {
-      font-size: 16px;
-      margin-left: 10rpx;
-    }
+
 
   }
 

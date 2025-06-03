@@ -1,24 +1,37 @@
 <script lang="ts" setup>
-import { getSearchRegionList, getSearcUserList } from '@/services/tenants';
+import { getAllUsersAPI, getAllUsersCountAPI, getSearchRegionList, getSearcUserList } from '@/services/tenants';
 import { useReginStore } from '@/stores';
-import type { onSearchRegionList, onSearchUserList, SeatchRegionList, SeatchUserList } from '@/types/tenants';
+import type { PageParams } from '@/types/global';
+import type { onAllUsersList, onSearchRegionList, onSearchUserList, SeatchRegionList, SeatchUserList } from '@/types/tenants';
+import { sendMessage } from '@/utils/webSocket';
+import { onLoad } from '@dcloudio/uni-app';
 import { ref } from 'vue';
 const { safeArea } = uni.getWindowInfo()
 const searchText = ref('');
-const selectedDevice = ref<any>(null);
-const selectedRoom = ref<any>(null);
 const regionStore = useReginStore()
 
-const handleDeviceClick = (device: any, room: any) => {
-  selectedDevice.value = device;
-  selectedRoom.value = room;
-  console.log(device, room)
-};
-//
+// 分页参数
+const pageParams: Required<PageParams> = {
+  page: 0,
+  pageSize: 100,
+  pass: 0,
+  total: 0
+}
+
+// 加载状态
+const finish = ref<boolean>(false)
+
+// 暂无数据
+const noData = ref(false)
+
+// 搜索框显示
 const show = ref(false)
+
 // 搜索
 const RegionList = ref<onSearchRegionList[]>() // 区域列表
+
 const UserList = ref<onSearchUserList[]>() // 用户列表
+
 const searchReigonList = async () => {
   // 区域搜索
   const regions: SeatchRegionList = {
@@ -39,6 +52,7 @@ const searchReigonList = async () => {
     if (res[0].state === '0000' && res[1].state === '0000') {
       RegionList.value = res[0].Table
       UserList.value = res[1].Table
+      show.value = true
     } else {
       uni.showToast({
         title: "未查找到用户，请重新搜索",
@@ -46,21 +60,32 @@ const searchReigonList = async () => {
       });
     }
   }
-  show.value = true
 }
 
+// // 按钮添加新用户
 // const handleAddDevice = () => {
-//   uni.showToast({
-//     title: '添加新设备',
-//     icon: 'none'
+//   uni.navigateTo({
+//     url: `/pageDataList/AddDevice/AddDevice`,
 //   });
 // };
+
 /* 扫描二维码 或者 条形码 */
 const onScanCode = () => {
   uni.scanCode({
     success: function (res) {
-      console.log('条码类型：' + res.scanType);
-      console.log('条码内容：' + res.result);
+      if (res.result.substring(0, 5) === 'login') {
+        const address = res.result.split(",");
+        sendMessage(`scan,${address[1]},${regionStore.regionPhone},${regionStore.regionId},${regionStore.token}`)
+        uni.showToast({
+          title: '登录成功！',
+        })
+      }
+
+      // uni.navigateTo({
+      //   url: `/pageDataList/AddDevice/AddDevice?code=${res.result}`,
+      // });
+      // console.log('条码类型：' + res.scanType);
+      // console.log('条码内容：' + res.result);
     }
   })
 }
@@ -69,25 +94,32 @@ const onScanCode = () => {
  * 点击切换区域按钮
  * @param item 返回的区域信息
  */
-const onToggleRegion = (item: onSearchRegionList) => {
+const onToggleRegion = async (item: onSearchRegionList) => {
   regionStore.regionId = item.region_id
   regionStore.regionName = item.region_name
   regionStore.authority = item.bind_power
-  uni.showToast({
-    title: '切换成功'
-  })
+  searchText.value = ''
+
+
+  // 切换区域后，重新加载数据
   uni.switchTab({
     url: '/pages/index/index',
-    success: (success) => {
+    success: () => {
       let page = getCurrentPages().pop()
       if (page == undefined || page == null) return;
       page.onLoad!()
     },
   });
+  // 重置数据
+  resetData()
+  // 获取页面用户
+  await Promise.all([getAllUsersData(),
+  getAllUsersCount()
+  ])
   // 关闭弹出层
   show.value = false
-}
 
+}
 
 /**
  * 点击切换用户按钮
@@ -100,8 +132,84 @@ const onToggleUser = (item: onSearchUserList) => {
   show.value = false
 }
 
+// 用户数量
+const userCount = ref<number>(0)
+
+/**
+ * 获取区域用户数量
+ */
+const getAllUsersCount = async () => {
+  noData.value = false
+  const res = await getAllUsersCountAPI({ cmd: 'all_user_count', regionid: regionStore.regionId! })
+  if (Number(res.Table![0].Column1) > 0) {
+    userCount.value = Number(res.Table![0].Column1)
+    pageParams.total = Math.ceil(userCount.value / pageParams.pageSize)
+  } else {
+    noData.value = true
+  }
+}
+
+/**
+ * 获取用户信息
+ */
+const tenantsList = ref<onAllUsersList[]>([])
+const getAllUsersData = async () => {
+  if (finish.value === true) {
+    return
+  }
+  pageParams.pass = pageParams.page === 0 ? 0 : pageParams.page * pageParams.pageSize - 1
+  const res = await getAllUsersAPI(
+    {
+      cmd: 'all_user_info', regionid: regionStore.regionId!,
+      pass: pageParams.pass, pageSize: pageParams.pageSize
+    })
+  if (res.state === '0000') {
+    tenantsList.value.push(...res.Table!)
+  }
+  if (pageParams.page < pageParams.total) {
+    // 页码累加
+    pageParams.page++
+  } else if (pageParams.page >= pageParams.total) {
+    finish.value = true
+  }
+}
+
+
+onLoad(async () => {
+  await Promise.all([getAllUsersData(),
+  getAllUsersCount()
+  ])
+})
+// 重置数据
+const resetData = () => {
+  pageParams.page = 0
+  tenantsList.value = []
+  finish.value = false
+}
+
+// 触底触发
+const onScrolltolower = async () => {
+  await getAllUsersData()
+}
+
+//下拉刷新触发
+const isTriggered = ref(false)
+const onRefresherrefresh = async () => {
+  //开启加载
+  isTriggered.value = true
+  // 清除数据
+  resetData()
+  //加载数据
+  await Promise.all([getAllUsersData(), getAllUsersCount()])
+  //关闭加载
+  isTriggered.value = false
+  uni.showToast({
+    title: '刷新成功！',
+    icon: 'none'
+  })
+}
 </script>
-z
+
 <template>
   <view class="container" :style="{ paddingTop: safeArea!.top + 'px' }">
     <text class="tenants-name">租户</text>
@@ -112,6 +220,52 @@ z
         class="search-input" v-model="searchText" />
       <uni-icons type="search" size="20" color="#999" @tap="searchReigonList" />
     </view>
+    <!-- 无用户 -->
+    <view class="status-tip" v-if="noData">
+      <wd-status-tip image="search" tip="暂无数据" />
+    </view>
+    <!-- 设备列表 -->
+    <scroll-view refresher-enabled @refresherrefresh="onRefresherrefresh" :refresher-triggered="isTriggered"
+      @scrolltolower="onScrolltolower" v-else class="device-list" scroll-y>
+      <view class="room-section" v-for="item in tenantsList" :key="item.user_id">
+        <view v-if="item.watthour_meter_id || item.water_meter_id || item.hot_meter_id || item.locker_id">
+          <view class="room-header">
+            <view class="room-title">
+              <uni-icons type="home" size="20" color="#666" />
+              <text>{{ item.room_num }}室</text>
+              <view class="room-device">
+                <text class="icon-dianbiao" v-if="item.watthour_meter_id" />
+                <text class="icon-lengshuibiao" v-if="item.water_meter_id" />
+                <text class="icon-reshuibiao1" v-if="item.hot_meter_id" />
+                <text class="icon-mensuo" v-if="item.locker_id" />
+              </view>
+            </view>
+            <text class="tenant-name">楼幢：{{ item.block_num }}</text>
+          </view>
+          <navigator
+            :url="`/pages/device/device?id=${item.user_id}&watthour=${item.watthour_meter_id}&water=${item.water_meter_id}&hot=${item.hot_meter_id}&locker=${item.locker_id}`"
+            hover-class="none" class="device-card">
+            <view class="card-left">
+              <view class="device-info">
+                <text class="device-name">{{ item.user_name }}</text>
+                <text class="device-id">编号：{{ item.user_id }}</text>
+              </view>
+            </view>
+            <view class="card-right">
+              <text class="reading">剩余余额：{{ item.user_balance }}元
+              </text>
+              <text class="status" :class="[item.user_state === '0' ? 'inuse' : 'unused']">
+                {{ item.user_state === '0' ? '未使用' : '使用中' }}
+              </text>
+            </view>
+          </navigator>
+        </view>
+      </view>
+      <view class="loading-text">
+        {{ finish ? '没有更多数据~' : '正在加载...' }}
+      </view>
+    </scroll-view>
+    <!-- 搜索框结果 -->
     <wd-popup v-model="show" position="bottom" custom-style="max-height: 80%;">
       <scroll-view scroll-y>
         <view class="popup-bottom">
@@ -134,41 +288,6 @@ z
         </view>
       </scroll-view>
     </wd-popup>
-    <!-- 设备列表 -->
-    <scroll-view class="device-list" scroll-y>
-      <view class="room-section" v-for="room in 10" :key="room">
-        <view class="room-header">
-          <view class="room-title">
-            <uni-icons type="home" size="20" color="#666" />
-            <text>11室</text>
-            <view class="room-device">
-              <text class="icon-dianbiao" />
-              <text class="icon-lengshuibiao" />
-              <text class="icon-reshuibiao1" />
-              <text class="icon-mensuo" />
-            </view>
-          </view>
-          <text class="tenant-name">租户：阿瑟费嘎</text>
-        </view>
-        <navigator url="/pages/device/device" hover-class="none" v-for="device in 1" :key="device" class="device-card"
-          @tap="handleDeviceClick(device, room)">
-          <view class="card-left">
-            <view class="device-info">
-
-              <text class="device-name">123123</text>
-              <text class="device-id">编号：0012351234</text>
-            </view>
-          </view>
-          <view class="card-right">
-            <text class="reading">剩余余额：100元
-            </text>
-            <text :class="['status', 'unused' === 'unused' ? 'unused' : 'inuse']">
-              {{ 'unused' === 'unused' ? '未使用' : '使用中' }}
-            </text>
-          </view>
-        </navigator>
-      </view>
-    </scroll-view>
     <!-- 添加设备按钮 -->
     <!-- <view class="add-button " @tap="handleAddDevice">
       <uni-icons type="plusempty" size="24" color="#FFFFFF" />
@@ -190,6 +309,18 @@ page {
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+
+  .status-tip {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .wd-status-tip {
+      transform: translateY(-50%);
+    }
+  }
 
   .tenants-name {
     margin: 30rpx 0;
@@ -230,12 +361,6 @@ page {
         left: 20rpx;
 
       }
-    }
-
-    .region-info {
-
-
-      .region-name {}
     }
 
     .user-info {
@@ -338,6 +463,13 @@ page {
         }
       }
     }
+
+    .loading-text {
+      text-align: center;
+      font-size: 28rpx;
+      color: #666;
+      padding: 20rpx 0;
+    }
   }
 
 
@@ -350,7 +482,7 @@ page {
   bottom: 140rpx;
   width: 100rpx;
   height: 100rpx;
-  background-color: #4CAF50;
+  background-color: #67B469;
   border-radius: 50rpx;
   display: flex;
   align-items: center;

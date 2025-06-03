@@ -1,62 +1,187 @@
 <script setup lang="ts">
+import { getRegionUserState } from '@/services/region';
+import { tenantList } from '@/services/tenantsList';
+import { useReginStore } from '@/stores';
+import type { PageParams } from '@/types/global';
+import type { tenantListRes, tenantsName } from '@/types/tenantsLIst';
+import { onLoad } from '@dcloudio/uni-app';
 import { ref } from 'vue'
 
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getWindowInfo()
-
+// 分页参数
+const pageParams: Required<PageParams> = {
+  page: 0,
+  pageSize: 100,
+  pass: 0,
+  total: 0
+}
+const regionStore = useReginStore()
 // tabs 数据
 const orderTabs = ref([
   { orderState: 0, title: '全部用户' },
   { orderState: 1, title: '欠费用户' },
   { orderState: 2, title: '停电用户' },
-  { orderState: 3, title: '停水用户' },
+  { orderState: 3, title: '停冷水用户' },
+  { orderState: 4, title: '停热水用户' },
 ])
 // 获取页面参数
 defineProps<{
   type: string
 }>()
 
-const tab = ref(0)
+// 获取设备运行情况
+const regionUserState = ref<number>()
+const regionUserStateData = async () => {
+  const res = await getRegionUserState({ cmd: "get_region_user_state", regionid: regionStore.regionId! })
+  if (res.state === '0000') {
+    const total = Number(res.Table![0].zhs)
+    regionUserState.value = Math.ceil(total / pageParams.pageSize);
+  } else {
+    regionUserState.value = 0
+  }
+}
 
+
+// 已结束标记
+const finish = ref(false)
+
+// 暂无数据
+const noData = ref(false)
+
+// 获取租户列表数据
+const tenantListData = ref<tenantListRes[]>([])
+const getTenantListData = async (name: tenantsName,) => {
+  if (finish.value === true) {
+    return
+  }
+  noData.value = false
+  pageParams.pass = pageParams.page === 0 ? 0 : pageParams.page * pageParams.pageSize - 1
+  const res = await tenantList({
+    cmd: 'get_all_device_list',
+    regionid: regionStore.regionId!,
+    devicename: name,
+    pass: pageParams.pass,
+    pageSize: pageParams.pageSize
+  })
+  if (res.state === '0000') {
+    res.Table!.map((item) => {
+      item.user_states = item.user_state === '1' ? 'icon-qiyong' : 'icon-tingyong'
+      if (tab.value === 2) {
+        item.icon = 'icon-dianbiao'
+      } else if (tab.value === 3) {
+        item.icon = 'icon-lengshuibiao'
+      } else if (tab.value === 4) {
+        item.icon = 'icon-reshuibiao1'
+      } else {
+        item.icon = 'icon-icon-user'
+      }
+      return item
+    })
+    tenantListData.value.push(...res.Table!)
+  } else if (tenantListData.value.length === 0 && res.state === '4001') {
+    noData.value = true
+  }
+  if (name === 'all') {
+    if (pageParams.page < regionUserState.value!) {
+      // 页码累加
+      pageParams.page++
+    } else if (pageParams.page >= regionUserState.value!) {
+      finish.value = true
+    }
+  } else {
+    finish.value = true
+  }
+}
+// 切换tab
+const tab = ref(0)
+const TabIndex = async (tab: number) => {
+  switch (tab) {
+    case 0:
+      getTenantListData('all')
+      break
+    case 1:
+      getTenantListData('qf')
+      break
+    case 2:
+      getTenantListData('db')
+      break
+    case 3:
+      getTenantListData('sb')
+      break
+    case 4:
+      getTenantListData('rb')
+      break
+  }
+}
+const onScrolltolower = () => {
+  if (tab.value === 0) {
+    TabIndex(tab.value)
+  }
+}
+// 监听切换
+const onSwiperChange = (Tab: number) => {
+  tab.value = Tab
+  resetData()
+  TabIndex(Tab)
+}
+// 重置数据
+const resetData = () => {
+  pageParams.page = 0
+  tenantListData.value = []
+  finish.value = false
+}
+
+// 页面加载完成后获取数据
+onLoad(async () => {
+  await regionUserStateData()
+  await getTenantListData('all')
+})
 </script>
 
 <template>
   <view class="viewport">
     <!-- tabs -->
-    <wd-tabs v-model="tab">
+    <wd-tabs v-model="tab" slidable="always">
       <block v-for="item in orderTabs" :key="item.orderState">
         <wd-tab :title="item.title">
         </wd-tab>
       </block>
     </wd-tabs>
     <!-- 滑动容器 -->
-    <swiper class="swiper" :current="tab" @change="tab = $event.detail.current">
+    <swiper class="swiper" :current="tab" @change="onSwiperChange($event.detail.current)">
       <!-- 滑动项 -->
       <swiper-item v-for="item in orderTabs" :key="item.title">
         <!-- 订单列表 -->
-        <scroll-view scroll-y class="orders">
-          <view class="card" v-for="item in 10" :key="item">
-            <view class="header">
-              <view class="icons" :class="item % 2 === 0 ? 'icon-qiyong' : 'icon-tingyong'"></view>
-              <view class="type">啊手机都放辣椒收到啦放假啦 </view>
+        <scroll-view scroll-y class="orders" @scrolltolower="onScrolltolower">
+          <!-- 空状态 -->
+          <view v-if="noData" class="status-tip">
+            <wd-status-tip image="search" tip="暂无数据" />
+          </view>
+          <view v-else>
+            <view class="card" v-for="item, index in tenantListData" :key="index">
+              <view class="header">
+                <view class="icons" :class="item.user_states"></view>
+                <view class="type">{{ item.block_num }} </view>
+              </view>
+              <!-- 订单信息 -->
+              <navigator class="goods" :url="`/pages/device/device?id=${item.user_id}`" hover-class="none">
+                <view class="cover" :class="item.icon">
+                </view>
+                <view class="meta">
+                  <view class="name">名称:{{ item.user_name }}</view>
+                  <view class="id">编号:{{ item.user_id }}</view>
+                  <view class="id">房号:{{ item.room_num }}</view>
+                </view>
+                <view class="payment">
+                  <text class="symbol">¥{{ item.user_balance }}</text>
+                </view>
+              </navigator>
             </view>
-            <!-- 订单信息 -->
-            <navigator v-for="sku in 1" :key="sku" class="goods" :url="`/pagesOrder/detail/detail?id=1`"
-              hover-class="none">
-              <view class="cover icon-dianbiao">
-              </view>
-              <view class="meta">
-                <view class="name">名称:小碎花泡泡袖</view>
-                <view class="id">表号:1354384116841</view>
-              </view>
-              <view class="payment">
-                <text class="symbol">¥-991566.16</text>
-              </view>
-            </navigator>
           </view>
           <!-- 底部提示文字 -->
           <view class="loading-text" :style="{ paddingBottom: safeAreaInsets?.bottom + 'px' }">
-            {{ true ? '没有更多数据~' : '正在加载...' }}
+            {{ finish ? '没有更多数据~' : '正在加载...' }}
           </view>
         </scroll-view>
       </swiper-item>
@@ -84,6 +209,14 @@ page {
 // 订单列表
 .orders {
   height: 100%;
+
+  .status-tip {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 
   .card {
     min-height: 100rpx;
@@ -133,6 +266,7 @@ page {
       border-radius: 10rpx;
       overflow: hidden;
       position: relative;
+
     }
 
     .quantity {
@@ -185,13 +319,12 @@ page {
     }
   }
 
-
-
   .loading-text {
     text-align: center;
     font-size: 28rpx;
     color: #666;
-    padding: 20rpx 0;
+    padding: 40rpx 0;
+    margin-bottom: 60rpx;
   }
 }
 

@@ -1,19 +1,7 @@
 <script lang="ts" setup>
 import { ref } from "vue";
-import { doorlocks } from "@/data/deviceData/deviceIfon";
+import { doorlocks, lockerOperations, userBut } from "@/data/deviceData/deviceIfon";
 import { setButtonTypeProcess } from './buttonAchieve'
-const operations = ref([
-  { type: 3, name: "更新", icon: "icon-gengxin" },
-  { type: 4, name: "二维码", icon: "icon-fenxiangerweima" },
-  { type: 5, name: "修改电表", icon: "icon-xiugai" },
-  { type: 6, name: "充值", icon: "icon-huiyuanchongzhi" },
-  { type: 7, name: "初始化", icon: "icon-chushihuajiaobenshibai" },
-  { type: 8, name: "采集器", icon: "icon-xinhaoqiangdu" },
-  { type: 9, name: "操作记录", icon: "icon-caozuojilu" },
-  { type: 10, name: "数据记录", icon: "icon--record" },
-  { type: 11, name: "控制设备", icon: "icon-shouye-dangqianshujusuozaiweizhitubiao" },
-  { type: 12, name: "解绑设备", icon: "icon-shanchushebeixinghao" },
-]);
 
 // 按钮修改密码
 const modify = ref(true)
@@ -23,6 +11,9 @@ const iconStyle = ref("icon-bianji")
 const setModify = () => {
   modify.value = !modify.value
   iconStyle.value = modify.value ? "icon-bianji" : "icon-queding"
+  if (modify.value && doorlocks.Permanent.length == 6) {
+    console.log("修改成功")
+  }
 }
 
 // 按钮修改密码
@@ -33,6 +24,9 @@ const iconStyle2 = ref("icon-bianji")
 const setModify2 = () => {
   modify2.value = !modify2.value
   iconStyle2.value = modify2.value ? "icon-bianji" : "icon-queding"
+  if (modify2.value) {
+    console.log("修改成功")
+  }
 }
 
 // 弹窗提示
@@ -63,7 +57,7 @@ const showIcon = () => {
 
     <view class="device-stats">
       <text class="stat-label">永久密码</text>
-      <input class="stat-value" :disabled="modify" :class="{ activeTap: !modify }" :value="doorlocks.Permanent"
+      <input class="stat-value" :disabled="modify" :class="{ activeTap: !modify }" v-model="doorlocks.Permanent"
         type="number" :maxlength="6" :safe-password-length="6" />
       <button class="stat-but" :class="iconStyle" hover-class="none" plain @tap="setModify">
       </button>
@@ -76,19 +70,30 @@ const showIcon = () => {
         <text class="popup-prompt" :style="{ display: showPopup ? 'inline' : 'none' }">开门后失效</text>
       </view>
 
-      <input class="status-value" :disabled="modify2" :class="{ activeTap: !modify2 }" :value="doorlocks.Temporary"
+      <input class="status-value" :disabled="modify2" :class="{ activeTap: !modify2 }" v-model="doorlocks.Temporary"
         type="number" :maxlength="6" />
       <button class="status-but" :class="iconStyle2" hover-class="none" plain @tap="setModify2">
       </button>
 
     </view>
   </view>
-
+  <!-- 通用按钮 -->
+  <view class="operation-section">
+    <text class="section-title">用户操作</text>
+    <view class="operation-grid">
+      <button class="grid-item" hover-class="none" plain v-for="(item, index) in userBut" :key="index"
+        @tap="setButtonTypeProcess(3, item.type)">
+        <view class="icon-wrapper" :class="item.icon">
+        </view>
+        {{ item.name }}
+      </button>
+    </view>
+  </view>
   <!-- 操作区域 -->
   <view class="operation-section">
     <text class="section-title">更多操作</text>
     <view class="operation-grid">
-      <button class="grid-item" hover-class="none" plain v-for="(item, index) in operations" :key="index"
+      <button class="grid-item" hover-class="none" plain v-for="(item, index) in lockerOperations" :key="index"
         @tap="setButtonTypeProcess(3, item.type)">
         <view class="icon-wrapper" :class="item.icon">
         </view>

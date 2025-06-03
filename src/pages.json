@@ -110,7 +110,19 @@
 					"style": {
 						"navigationBarTitleText": "失败数量"
 					}
-				}
+				},
+				{
+					"path": "AddGateway/AddGateway",
+					"style": {
+						"navigationBarTitleText": "添加网关"
+					}
+				},
+        {
+          "path": "AddDevice/AddDevice",
+          "style": {
+            "navigationBarTitleText": "添加用户"
+          }
+        }
 			]
 		},
 		{

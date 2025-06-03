@@ -1,4 +1,5 @@
-import type { Fun } from "./global"
+import type { Fun, PageParams, RegionIdReuse } from "./global"
+import type { tenantListRes } from "./tenantsLIst"
 
 /**
  * 获取区域信息
@@ -32,4 +33,35 @@ export type onSearchUserList = {
   user_phone:string, // 用户手机
   block_num:string, //楼栋名称
   room_num:string //用户房号
+}
+
+/**
+ * 获取租户页面全部用户
+ */
+
+export type AllUsersList = RegionIdReuse & PageParams
+
+
+/**
+ * 返回租户页面全部用户
+ */
+
+export type onAllUsersList = tenantListRes &{
+  locker_id:string,
+  locker_state:string
+}
+
+/**
+ * 获取租户页面全部用户数量
+ */
+
+export type AllUsersCount = RegionIdReuse
+
+
+/**
+ * 返回租户页面全部用户数量
+ */
+
+export type onAllUsersCount = {
+  Column1:string // 数量
 }

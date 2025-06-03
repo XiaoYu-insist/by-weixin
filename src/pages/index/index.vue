@@ -7,7 +7,7 @@ import { onLoad } from '@dcloudio/uni-app';
 import { ref } from 'vue';
 import PageSkeleton from './components/PageSkeleton.vue';
 import { useReginStore } from '@/stores';
-import { getCollectorState, getDeviceFailCount, getRegionIncomeInfo, getRegionInfo, getRegionMoneyIncomeInfo, getRegionUserState } from '@/services/region';
+import { getCollectorState, getDeviceFailCount, getRegionIncomeInfo, getRegionInfo, getRegionUserState } from '@/services/region';
 import type { onIncomeInfo, onRegionUserState } from '@/types/region';
 const regionStore = useReginStore()
 
@@ -17,18 +17,6 @@ const regionInfoData = async () => {
   if (res.state === '0000') {
     regionStore.regionName = res.Table![0].region_name
   }
-}
-
-// 区域月份收入信息
-const regionMoneyIncomeData = ref()
-const regionMoneyIncomeInfoData = async () => {
-  const res = await getRegionMoneyIncomeInfo({
-    cmd: 'get_money_money', regionid: '000090',
-    startDate: '2024-08-01',
-    endDate: '2025-08-31',
-  })
-  regionMoneyIncomeData.value = res.Table!
-  console.log('区域月份收入信息', regionMoneyIncomeData.value)
 }
 
 // 区域收入信息
@@ -42,7 +30,11 @@ const regionIncomeInfoData = async () => {
 const regionUserState = ref<onRegionUserState>()
 const regionUserStateData = async () => {
   const res = await getRegionUserState({ cmd: "get_region_user_state", regionid: regionStore.regionId! })
-  regionUserState.value = res.Table![0]
+  if (res.state === '0000') {
+    regionUserState.value = res.Table![0]
+  } else {
+    regionUserState.value = 0 as any
+  }
 }
 
 // 获取采集器总数量
@@ -67,8 +59,6 @@ const deviceFailCountDate = async () => {
   }
 }
 
-
-
 // 骨架加载
 const Skeleton = ref(false)
 // 初始化加载
@@ -76,7 +66,7 @@ onLoad(async () => {
   Skeleton.value = true
   if (regionStore.token) {
     await Promise.all([regionInfoData(), regionIncomeInfoData(), regionUserStateData(),
-    collectorStateData(), deviceFailCountDate(), regionMoneyIncomeInfoData()
+    collectorStateData(), deviceFailCountDate(),
     ])
   } else {
     uni.showToast({
@@ -86,7 +76,8 @@ onLoad(async () => {
   }
   Skeleton.value = false
 })
-
+// 图表下拉刷新调用
+const electroanalysisRef = ref()
 //下拉刷新触发
 const isTriggered = ref(false)
 const onRefresherrefresh = async () => {
@@ -94,7 +85,7 @@ const onRefresherrefresh = async () => {
   isTriggered.value = true
   //加载数据
   await Promise.all([regionInfoData(), regionIncomeInfoData(), regionUserStateData(),
-  collectorStateData(), deviceFailCountDate(), regionMoneyIncomeInfoData()
+  collectorStateData(), deviceFailCountDate(), electroanalysisRef.value.getLine()
   ])
   //关闭加载
   isTriggered.value = false
@@ -117,13 +108,18 @@ const onRefresherrefresh = async () => {
         <!-- 设备运行情况 -->
         <DeviceRun :listUser="regionUserState!" :collectorCount="collectorCount!" :deviceFailCount="deviceFailCount!" />
         <!-- 用电分析卡片 -->
-        <Electroanalysis />
+        <Electroanalysis ref="electroanalysisRef" />
       </view>
     </scroll-view>
   </template>
 </template>
 
 <style lang="scss">
+page {
+  height: 100%;
+  overflow: hidden;
+}
+
 .main-content {
   flex: 1;
   padding: 30rpx;

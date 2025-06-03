@@ -1,5 +1,7 @@
 <script lang="ts" setup>
 import { useReginStore, useCodeStore } from '@/stores';
+import type { ImageOnErrorEvent } from '@uni-helper/uni-app-types';
+import { onMounted, ref } from 'vue';
 const { safeArea } = uni.getWindowInfo()
 const regionStore = useReginStore()
 const codeStore = useCodeStore()
@@ -25,18 +27,38 @@ const handleLogout = () => {
     },
   });
 };
+// 使用响应式变量控制头像地址
+const avatarUrl = ref('')
+
+onMounted(() => {
+  if (regionStore.token) {
+    // 添加随机参数避免缓存
+    avatarUrl.value = `http://www.boyun.club/upload/user/${regionStore.regionPhone}.jpg?t=${Math.random()}`
+  }
+})
+
+// 图片加载错误处理
+const handleAvatarError = (e: ImageOnErrorEvent) => {
+  avatarUrl.value = '/static/images/region_img.jpg' // 使用绝对路径
+}
 </script>
 <template>
   <view class="head" :style="{ paddingTop: safeArea!.top + 'px' }">
     <!-- 用户信息区域 -->
-    <view class="user-section">
+    <!-- 未登陆 -->
+    <view class="user-section" v-if="regionStore.token">
+      <view class="avatar-container">
+        <image class="avatar" :src="avatarUrl" @error="handleAvatarError" mode="aspectFill" />
+        <view class="username">{{ regionStore.regionName }}</view>
+      </view>
+    </view>
+    <!-- 已登录 -->
+    <view class="user-section" v-else>
       <navigator class="avatar-container" hover-class="none" url="/pages/login/login">
-        <image class="avatar" src="https://public.readdy.ai/ai/img_res/30826713d88cd23b9870782b01cdd83c.jpg"
-          mode="aspectFill" />
+        <image class="avatar" src="@/static/images/region_img.jpg" mode="aspectFill" />
         <view class="username">你好</view>
       </navigator>
     </view>
-
     <!-- 功能列表 -->
     <view class="menu-list">
       <navigator class="menu-item cursor-pointer" hover-class="none" url="/pageSettings/house/house">
@@ -47,8 +69,7 @@ const handleLogout = () => {
         <uni-icons type="right" size="16" color="#CCCCCC"></uni-icons>
       </navigator>
 
-      <navigator class="menu-item cursor-pointer" hover-class="none"
-        :url="`/pageDataList/exhibitList/exhibitList?type=${0}`">
+      <navigator class="menu-item cursor-pointer" hover-class="none" :url="`/pageSettings/recharge/recharge`">
         <view class="menu-item-left">
           <text class="icon-chongzhijilu" />
           <text>充值记录</text>
@@ -56,8 +77,7 @@ const handleLogout = () => {
         <uni-icons type="right" size="16" color="#CCCCCC"></uni-icons>
       </navigator>
 
-      <navigator class="menu-item cursor-pointer" hover-class="none"
-        :url="`/pageDataList/exhibitList/exhibitList?type=${0}`">
+      <navigator class="menu-item cursor-pointer" hover-class="none" :url="`/pageSettings/usage/usage`">
         <view class="menu-item-left">
           <text class="icon-ele_bill" />
           <text>操作记录</text>
@@ -76,7 +96,7 @@ const handleLogout = () => {
   </view>
 </template>
 
-<style>
+<style lang="scss">
 page {
   height: 100%;
 }
@@ -110,9 +130,8 @@ page {
 }
 
 .username {
-  font-size: 18px;
+  font-size: 50rpx;
   color: #333333;
-  font-weight: 500;
 }
 
 .menu-list {
@@ -134,24 +153,10 @@ page {
   display: flex;
   align-items: center;
   gap: 20rpx;
-}
 
-.menu-item-left text {
-  font-size: 16px;
-  color: #333333;
-}
-
-.action-button {
-  display: flex;
-  align-items: center;
-  background-color: #4caf50;
-  padding: 12rpx 24rpx;
-  border-radius: 30rpx;
-  gap: 8rpx;
-}
-
-.action-button text {
-  color: #ffffff;
-  font-size: 14px;
+  .menu-item-left text {
+    font-size: 28rpx;
+    color: #333333;
+  }
 }
 </style>

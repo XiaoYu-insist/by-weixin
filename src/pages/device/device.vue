@@ -1,15 +1,32 @@
 <script lang="ts" setup>
 import BYdevice from "@/components/BYdevice.vue";
+import { onLoad } from "@dcloudio/uni-app";
 import { ref } from "vue";
+const query = defineProps<{
+  id: string,
+  watthour: string,
+  water: string,
+  hot: string,
+  locker: string
+}>()
 const currentNav = ref(0);
-const navItems = ref([
-  "电表",
-  "水表",
-  "热表",
-  "门锁",
-]);
-
+const navItems = ref<string[]>([]);
+onLoad(() => {
+  if (query.watthour) {
+    navItems.value.push("电表");
+  }
+  if (query.water) {
+    navItems.value.push("水表");
+  }
+  if (query.hot) {
+    navItems.value.push("热表");
+  }
+  if (query.locker) {
+    navItems.value.push("门锁");
+  }
+})
 </script>
+
 <template>
   <view class="pages">
     <!-- 左侧导航栏 -->
@@ -23,9 +40,9 @@ const navItems = ref([
     <!-- 主内容区域 -->
     <view class="main-content">
       <view v-for="item, index in navItems" :key="index">
-        <BYdevice v-if="index === currentNav && currentNav !== 3" :type="currentNav" />
+        <BYdevice v-if="index === currentNav && currentNav !== 3" :type="currentNav" :userId="id" />
       </view>
-      <BYdoorlocks v-if="currentNav === 3" />
+      <BYdoorlocks v-if="currentNav === 3" :userId="id" />
     </view>
   </view>
 </template>

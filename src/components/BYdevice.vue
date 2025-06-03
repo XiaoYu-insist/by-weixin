@@ -1,14 +1,18 @@
 <script lang="ts" setup>
 import { ref, onBeforeMount } from "vue";
-import { ammeter, water, hotwater, operations } from '@/data/deviceData/deviceIfon'
-import { setButtonTypeProcess } from './buttonAchieve'
+import { ammeter, water, hotwater, operations, userBut } from '@/data/deviceData/deviceIfon'
+import { getUserInfoData, setButtonTypeProcess } from './buttonAchieve'
 
 const query = defineProps<{
-  type: number
+  type: number,
+  userId: string
 }>()
 // 设备
 const deviceList = ref()
-onBeforeMount(() => {
+onBeforeMount(async () => {
+  const res = await getUserInfoData(query.userId)
+  console.log(res)
+  // 根据 query.type 的值来选择不同的设备列表
   if (query.type === 0) {
     deviceList.value = ammeter
   } else if (query.type === 1) {
@@ -43,12 +47,22 @@ const handleButtonClick = (DeviceId: number, butType: number) => {
         <text class="stat-label">设备倍率</text>
       </view>
       <view class="stat-item">
-        <text class="stat-value">{{ deviceList?.Price }}</text>
+        <wd-tooltip v-if="true" placement="bottom" useContentSlot>
+          <text class="stat-tip">详细</text>
+          <template #content>
+            <view>
+              <view>多行文本1</view>
+              <view>多行文本2</view>
+              <view>多行文本3</view>
+            </view>
+          </template>
+        </wd-tooltip>
+        <text v-else class="stat-value">{{ deviceList?.Price }}</text>
         <text class="stat-label">价格</text>
       </view>
       <view class="stat-item">
-        <text class="stat-value">{{ deviceList?.Powerl }}</text>
-        <text class="stat-label">使用量</text>
+        <text class="stat-value">{{ deviceList?.Coll }}</text>
+        <text class="stat-label">采集器</text>
       </view>
       <view class="stat-item">
         <text class="stat-label">设备类型</text>
@@ -64,7 +78,18 @@ const handleButtonClick = (DeviceId: number, butType: number) => {
       </view>
     </view>
   </view>
-
+  <!-- 通用按钮 -->
+  <view class="operation-section">
+    <text class="section-title">用户操作</text>
+    <view class="operation-grid">
+      <button class="grid-item" hover-class="none" plain v-for="(item, index) in userBut" :key="index"
+        @tap="setButtonTypeProcess(3, item.type)">
+        <view class="icon-wrapper" :class="item.icon">
+        </view>
+        {{ item.name }}
+      </button>
+    </view>
+  </view>
   <!-- 操作区域 -->
   <view class="operation-section">
     <text class="section-title">更多操作</text>
@@ -132,6 +157,10 @@ const handleButtonClick = (DeviceId: number, butType: number) => {
       align-items: center;
       gap: 10rpx;
       padding: 20rpx 0;
+
+      .stat-tip {
+        color: #fc876f;
+      }
 
       &:nth-child(-n+3) {
         border-bottom: 1px solid #f0f0f0;

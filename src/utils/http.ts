@@ -77,16 +77,6 @@ export const http = <T>(options:UniApp.RequestOptions)=>{
             icon: 'none'
           })
         }
-        // 添加泛型
-      },
-      // 失败 reject
-      fail(err) {
-        // 网络错误
-        uni.showToast({
-          icon: 'none',
-          title: '网络错误，换个网络试试',
-        })
-        reject(err)
       }
     })
   })

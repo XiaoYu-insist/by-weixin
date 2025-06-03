@@ -1,4 +1,4 @@
-import type { CollectorState, deviceFailState, incomeInfo, onCollectorState, onDeviceFailState, onIncomeInfo, onRegionInfo, onRegionUserState, RegionId, RegionInfo, RegionMonthIncomeInfo, RegionStaff, RegionUserState } from "@/types/region"
+import type { CollectorState, deviceFailState, incomeInfo, onCollectorState, onDeviceFailState, onIncomeInfo, onRegionInfo, onRegionMonthIncomeInfo, onRegionUseChart, onRegionUserState, RegionId, RegionInfo, RegionMonthIncomeInfo, RegionStaff, RegionUseChart, RegionUserState } from "@/types/region"
 import { http } from "@/utils/http"
 
 /**
@@ -30,7 +30,7 @@ export const getRegionInfo = (data:RegionInfo)=>{
  * @param data 参数
  */
 export const getRegionMoneyIncomeInfo = (data:RegionMonthIncomeInfo)=>{
-  return http({
+  return http<onRegionMonthIncomeInfo[]>({
     method:'GET',
     url:"/WeChat_Api/index",
     data
@@ -87,3 +87,14 @@ export const getDeviceFailCount = (data:deviceFailState)=>{
   })
 }
 
+
+/**
+ * 获取区域用量图表
+ */
+export const getRegionUserChart = (data:RegionUseChart) =>{
+  return http<onRegionUseChart[]>({
+    method:'GET',
+    url:'/WeChat_Api/LineChart',
+    data
+  })
+}

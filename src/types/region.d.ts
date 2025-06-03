@@ -37,12 +37,33 @@ export type onRegionInfo = {
   wechat_id:string
 }
 
+/**
+ * 获取区域当月收入数据
+ */
 export type RegionMonthIncomeInfo = Fun & {
   regionid: string, // 区域id
   startDate: string, // 月份起
   endDate: string, // 月份止
 }
 
+/**
+ * 返回区域当月收入数据
+ */
+export type onRegionMonthIncomeInfo = {
+  block_num:string, // 楼栋
+  buyer_id: string, // 生成编号
+  order_amount: string, // 订单金额
+  order_comments:string, // 订单备注
+  order_id:string, // 订单id
+  order_mode:string, // 订单方式
+  order_time:string, // 订单时间
+  platform_trade_id:string, // 交易号
+  room_num:string, // 房间号
+  user_id:string, // 用户id
+  user_name:string, // 用户姓名
+  icon:string, // 使用icon
+  full:string, // 具体详细
+}
 
 /**
  *  获取区域收入
@@ -110,3 +131,18 @@ export type onDeviceFailState={
   device_type:deviceType
 }
 
+
+/**
+ * 获取区域用量图表
+ */
+export type RegionUseChart = RegionIdReuse
+
+
+/**
+ * 返回区域用量图表
+ */
+export type onRegionUseChart = {
+  date:string, // 日期
+  money:string, // 金额
+  amount:string, // 用量
+}

@@ -13,3 +13,4 @@ export default pinia
 // 模块统一导出
 export * from './modules/region'
 export * from './modules/wxOpenid'
+export * from './modules/recordParameter'
